@@ -32,6 +32,33 @@ npm run build    # frontmatter check → astro check → astro build
 npm run preview  # serves dist/
 ```
 
+## Giving the client a preview link
+
+Any preview **must** be built with `PUBLIC_PREVIEW=true` — `npm run build:preview` and
+`npm run deploy:preview` both set it. That emits `noindex, nofollow` on all 9 pages and a
+`Disallow: /` robots.txt, so a pre-launch site carrying unverified immigration figures and
+placeholder licence numbers cannot be indexed or mistaken for the live one.
+
+**Cloudflare Pages** (recommended — it is the spec's step 11 target, serves at the root of
+`*.pages.dev` so internal links work unchanged, and reads private repos):
+
+```bash
+npm run deploy:preview
+```
+
+First run opens a browser to sign in to Cloudflare. After that it is one command and you get
+a permanent `https://ivisalaw-preview.pages.dev`. To make it redeploy on every push instead,
+connect the repo in the Cloudflare dashboard with build command
+`npm run build:preview` and output directory `dist`.
+
+**Live walkthrough, no account:** `npm run preview` then
+`npx cloudflared tunnel --url http://localhost:4330` gives a temporary public URL for as long
+as your machine stays on. Fine for a screen-share, not for sending a link.
+
+**Do not use GitHub Pages** without extra work: on a free plan it needs a public repo, and it
+serves at `/ivisalaw/`, which breaks all 25 internal link destinations unless the built HTML
+is rewritten.
+
 ## Layout
 
 ```

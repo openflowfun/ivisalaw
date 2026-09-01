@@ -9,7 +9,9 @@
     "build": "npm run check:content && astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check:content": "sh scripts/check-frontmatter.sh"
+    "check:content": "sh scripts/check-frontmatter.sh",
+    "build:preview": "npm run check:content && astro check && PUBLIC_PREVIEW=true astro build",
+    "deploy:preview": "npm run build:preview && npx wrangler pages deploy dist --project-name=ivisalaw-preview --commit-dirty=true"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
