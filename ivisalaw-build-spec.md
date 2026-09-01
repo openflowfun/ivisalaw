@@ -162,8 +162,10 @@ Logo stays as supplied. Palette is built around it, not over it.
 4. ~~Navigation skeleton: 4 section indexes + `/assessment/`, `/about/`, `/contact/`~~ **done**
    — pulled forward out of step 5, because until it existed every item in the primary nav
    and every CTA on the site 404'd, and the client could not click through anything.
-5. Remaining 14 visa and employer pages, plus `/complaints/`, `/privacy/`, `/terms/`
-   (the three legal pages are linked from the footer sitewide and need client copy)
+5. **In progress** — remaining visa and employer pages, plus `/complaints/`, `/privacy/`,
+   `/terms/` (the three legal pages are linked from the footer sitewide and need client copy)
+   - done: `/work-visas/aewv/`, `/residence/green-list/`, `/residence/skilled-migrant/`
+   - next: `/employers/accreditation/`, `/employers/job-check/`, then family and the rest
 6. Eligibility checker
 7. Sveltia CMS wiring + client editing guide
 8. Sinhala / Tamil / Korean routes
