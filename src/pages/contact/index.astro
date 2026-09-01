@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+import Guilloche from '../../components/Guilloche.astro';
+import MediaSlot from '../../components/MediaSlot.astro';
+import { SITE, PENDING } from '../../lib/site';
+
+/* Office hours are client-supplied (see PENDING in lib/site.ts). The block
+   renders only once real hours are set, so nothing false ships. */
+const HOURS = PENDING.officeHours;
+
+const schema = [{
+  '@context': 'https://schema.org', '@type': 'LegalService',
+  name: SITE.name, legalName: SITE.legalName, url: SITE.url,
+  telephone: SITE.phone, email: SITE.email, areaServed: 'NZ',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${SITE.address.street}, ${SITE.address.street2}`,
+    addressLocality: SITE.address.locality,
+    postalCode: SITE.address.postcode,
+    addressCountry: SITE.address.country,
+  },
+}];
+---
+<Base
+  title="Contact iVISALAW — Immigration Advisers, High Street Auckland"
+  description="Call +64 9 368 1689 or email admin@ivisalaw.co.nz. Level 5, Southern Cross Building, 59–67 High Street, Auckland 1010."
+  schema={schema}
+>
+  <section class="head">
+    <Guilloche />
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span>
+        <span aria-current="page">Contact</span>
+      </nav>
+      <h1 id="h1"><span class="ln"><span>Talk to us</span></span></h1>
+      <p class="standfirst rv" data-d="2">
+        The fastest way to get a real answer is a booked assessment. For anything else,
+        call or email and we will come back to you.
+      </p>
+
+      <div class="grid">
+        <div class="card rv" data-d="1">
+          <h2>Phone</h2>
+          <a class="big" href={SITE.phoneHref}>{SITE.phone}</a>
+          <p>Best for booking an assessment or checking whether we can help at all.</p>
+        </div>
+        <div class="card rv" data-d="2">
+          <h2>Email</h2>
+          <a class="big" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <p>Include your current visa and what you are trying to do. It saves a round trip.</p>
+        </div>
+        <div class="card rv" data-d="3">
+          <h2>Office</h2>
+          <p class="big addr">
+            {SITE.address.street}<br />{SITE.address.street2}<br />
+            {SITE.address.locality} {SITE.address.postcode}
+          </p>
+          <p>Central Auckland, a short walk from Britomart.</p>
+        </div>
+      </div>
+
+      {HOURS && (
+        <dl class="hours rv" data-d="4">
+          {HOURS.map(h => <div><dt>{h.day}</dt><dd>{h.time}</dd></div>)}
+        </dl>
+      )}
+
+      <MediaSlot label="Office exterior" fallback="quiet" ratio={3.2} class="map rv" sizes="100vw" />
+
+      <p class="note rv" data-d="4">
+        We are licensed immigration advisers, not a law firm. If your matter needs a lawyer
+        we will tell you, and we would rather tell you early.
+      </p>
+    </div>
+  </section>
+
+  {import.meta.env.DEV && !HOURS && (
+    <div class="wrap"><p class="devwarn">
+      <strong>Pre-launch:</strong> office hours are still to be supplied by the client.
+      Set <code>PENDING.officeHours</code> in <code>src/lib/site.ts</code>. The block is
+      hidden until then rather than showing invented times.
+    </p></div>
+  )}
+</Base>
+
+<style>
+  .head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(3.5rem,7vw,6rem)}
+  .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
+  .crumb a{color:var(--ink-3);text-decoration:none}
+  .crumb a:hover{color:var(--indigo);text-decoration:underline}
+  .crumb span[aria-current]{color:var(--ink)}
+  h1{font-family:var(--serif);font-size:clamp(2.4rem,5.4vw,4.2rem);letter-spacing:-.032em;line-height:1.04;font-weight:350}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.6rem;font-size:1.16rem;color:var(--ink-2);max-width:52ch}
+
+  .grid{margin-top:clamp(2.5rem,5vw,3.5rem);display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem}
+  .card{background:var(--white);border:1px solid var(--rule);border-top:2px solid var(--indigo);border-radius:4px;padding:1.7rem 1.6rem}
+  .card h2{font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .big{display:block;margin-top:.7rem;font-family:var(--serif);font-size:1.42rem;font-weight:400;letter-spacing:-.02em;line-height:1.35;color:var(--indigo);text-decoration:none}
+  .big.addr{color:var(--ink);font-size:1.18rem}
+  .card p:not(.big){margin-top:.9rem;font-size:.92rem;color:var(--ink-2);line-height:1.6}
+
+  .hours{margin-top:1.75rem;border-top:1px solid var(--rule);padding-top:1.25rem}
+  .hours div{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px solid var(--rule);font-size:.95rem}
+  .hours dt{color:var(--ink-2)}
+  .hours dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+
+  .map{margin-top:2rem;}
+  .note{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--rule);font-size:.95rem;color:var(--ink-2);max-width:60ch}
+
+  .devwarn{margin-bottom:2rem;padding:.9rem 1.1rem;border:1px solid var(--indigo);border-left-width:3px;border-radius:0 4px 4px 0;background:var(--white);font-size:.88rem;color:var(--ink-2);line-height:1.6}
+  .devwarn code{font-size:.85em;background:var(--paper);padding:.1rem .35rem;border-radius:2px;border:1px solid var(--rule)}
+
+  @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ h1 .ln>span{transform:none!important} }
+</style>

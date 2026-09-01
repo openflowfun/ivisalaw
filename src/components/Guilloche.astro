@@ -1,0 +1,27 @@
+---
+/*
+  Rotating guilloche texture. Purely decorative: aria-hidden, no pointer
+  events, and rotation is paused entirely under reduced motion (global.css §10).
+  `currentColor` resolves against the .guillo class, so the same symbol
+  renders indigo on paper and white on the dark ground.
+
+  The texture is far wider than the viewport by design, so it ships with
+  its own clipping layer rather than relying on the parent to set
+  overflow:hidden. That matters for .pin-outer, where overflow:hidden on an
+  ancestor would kill the sticky positioning the pinned section depends on —
+  the clip is a *sibling* of the sticky element, never an ancestor.
+
+  The host only needs position:relative.
+*/
+interface Props { class?: string }
+const { class: extra } = Astro.props;
+---
+<div class="guillo-clip" aria-hidden="true">
+  <svg class:list={["guillo", extra]} viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+    <use href="#guilloche" />
+  </svg>
+</div>
+
+<style>
+  .guillo-clip{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+</style>

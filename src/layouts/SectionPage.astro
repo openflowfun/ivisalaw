@@ -1,0 +1,163 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import Base from './Base.astro';
+import Guilloche from '../components/Guilloche.astro';
+import MediaSlot from '../components/MediaSlot.astro';
+import CtaBand from '../components/home/CtaBand.astro';
+import { SITE } from '../lib/site';
+
+interface Props { entry: CollectionEntry<'sections'> }
+const { entry } = Astro.props;
+const d = entry.data;
+
+/*
+  Resolve each declared pathway against the visas collection. A pathway
+  whose page exists becomes a link; one that doesn't becomes an inert card
+  marked "in preparation". The index is therefore complete and honest from
+  the first day, never emits a dead link, and needs no manual updating as
+  pages are written.
+*/
+const visas = await getCollection('visas');
+const built = new Set(visas.map(v => `/${v.data.section}/${v.id}/`));
+
+const pathways = d.pathways.map(p => {
+  const href = p.href ?? (p.slug ? `/${d.section}/${p.slug}/` : undefined);
+  return { ...p, href, ready: href ? built.has(href) || !href.startsWith(`/${d.section}/`) : false };
+});
+// External-section links (href given explicitly) are only "ready" if built too.
+for (const p of pathways) {
+  if (p.href && !p.href.startsWith(`/${d.section}/`)) p.ready = built.has(p.href);
+}
+
+const url = new URL(Astro.url.pathname, SITE.url).href;
+const schema = [{
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url + '/' },
+    { '@type': 'ListItem', position: 2, name: d.navLabel, item: url },
+  ],
+}];
+---
+<Base title={d.seoTitle} description={d.description} schema={schema}>
+
+  <section class="sec-head-band">
+    <Guilloche />
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span>
+        <span aria-current="page">{d.navLabel}</span>
+      </nav>
+      <div class="head-grid">
+        <div>
+          <h1 id="h1"><span class="ln"><span>{d.title}</span></span></h1>
+          <p class="standfirst rv" data-d="2">{d.intro}</p>
+        </div>
+        <MediaSlot label="Section" fallback="quiet" class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="paths">
+    <div class="wrap">
+      <p class="lead rv">{d.lead}</p>
+      <div class="svc-grid glow-grid">
+        {pathways.map((p, i) => (
+          p.ready && p.href ? (
+            <a class="svc glow rv" data-d={String((i % 4) + 1)} href={p.href}>
+              {p.tag && <span class="tag">{p.tag}</span>}
+              <h3>{p.title}</h3>
+              <p>{p.note}</p>
+              <span class="go">Read more</span>
+            </a>
+          ) : (
+            <div class="svc soon rv" data-d={String((i % 4) + 1)}>
+              {p.tag && <span class="tag">{p.tag}</span>}
+              <h3>{p.title}</h3>
+              <p>{p.note}</p>
+              <span class="go">In preparation</span>
+            </div>
+          )
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {d.chooser && (
+    <section class="chooser alt">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 class="wipe">Which one applies to you</h2>
+          <p class="rv" data-d="1">{d.chooser.lead}</p>
+        </div>
+        <dl class="rows rv" data-d="1">
+          {d.chooser.rows.map(r => (
+            <div class="row">
+              <dt>{r.when}</dt>
+              <dd>{r.then}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="chooser-cta rv" data-d="2">
+          Not sure which line you are on? <a href="/assessment/">Book an assessment</a> and we will tell you.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</Base>
+
+<style>
+  .sec-head-band{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(2.5rem,5vw,4rem)}
+  .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
+  .crumb a{color:var(--ink-3);text-decoration:none}
+  .crumb a:hover{color:var(--indigo);text-decoration:underline}
+  .crumb span[aria-current]{color:var(--ink)}
+  .sec-head-band h1{font-family:var(--serif);font-size:clamp(2.4rem,5.4vw,4.2rem);letter-spacing:-.032em;line-height:1.04;font-weight:350;max-width:14ch}
+  .sec-head-band h1 .ln{display:block;overflow:hidden}
+  .sec-head-band h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  .sec-head-band h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.6rem;font-size:1.16rem;color:var(--ink-2);max-width:52ch}
+  .head-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(2rem,5vw,4rem);align-items:end}
+  .head-media{--ratio:1.5}
+
+  .paths{padding-block:clamp(2.5rem,5vw,4rem) clamp(3.5rem,7vw,6rem)}
+  .paths .lead{max-width:58ch;margin-bottom:clamp(2rem,4vw,3rem);color:var(--ink-2);font-size:1.05rem}
+
+  .svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .svc{background:var(--paper);padding:2rem 1.75rem;display:flex;flex-direction:column;gap:.7rem;text-decoration:none;color:inherit;position:relative;transition:background .5s var(--ease)}
+  .svc::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:var(--indigo);transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
+  a.svc:hover{background:var(--white)}
+  a.svc:hover::before{transform:scaleX(1)}
+  .svc h3{font-family:var(--serif);font-size:1.42rem;font-weight:400}
+  .svc p{font-size:.94rem;color:var(--ink-2);flex-grow:1}
+  .svc .go{font-size:.88rem;font-weight:600;color:var(--indigo)}
+  .svc .tag{align-self:flex-start;font-size:.74rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.24rem .6rem;border-radius:3px}
+
+  /* Declared but not yet written. Reads as planned, not broken. */
+  .svc.soon{opacity:.62}
+  .svc.soon h3{color:var(--ink-2)}
+  .svc.soon .go{color:var(--ink-3);font-weight:500}
+  .svc.soon .go::before{content:"";display:inline-block;width:.4rem;height:.4rem;border-radius:50%;background:var(--ink-3);margin-right:.45rem;vertical-align:middle}
+
+  .rows{margin:0;padding:0;border-top:1px solid var(--rule)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;padding:1.1rem 0;border-bottom:1px solid var(--rule)}
+  .row dt{color:var(--ink-2);font-size:.98rem}
+  .row dd{margin:0;font-weight:600;font-size:.98rem}
+  .chooser-cta{margin-top:1.75rem;font-size:.95rem;color:var(--ink-2)}
+
+  section.alt{background:var(--white);border-top:1px solid var(--rule)}
+
+  @media (max-width:1000px){
+    .head-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:760px){
+    .svc-grid{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr;gap:.35rem;padding:.95rem 0}
+    .row dd{color:var(--indigo)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sec-head-band h1 .ln>span{transform:none!important}
+  }
+</style>

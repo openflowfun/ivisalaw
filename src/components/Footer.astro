@@ -1,0 +1,56 @@
+---
+import { SITE } from '../lib/site';
+import { withBuiltFlag } from '../lib/routes';
+
+const visas = [
+  { href: '/work-visas/', label: 'Work visas' },
+  { href: '/residence/', label: 'Residence' },
+  { href: '/family/', label: 'Partner and family' },
+  { href: '/study/', label: 'Student visas' },
+  { href: '/appeals/', label: 'Declines and appeals' },
+];
+const employers = [
+  { href: '/employers/accreditation/', label: 'Accreditation' },
+  { href: '/employers/job-check/', label: 'Job Check' },
+  { href: '/employers/audits/', label: 'Audits and compliance' },
+  { href: '/employers/', label: 'Finding staff' },
+];
+// Only link to pages that exist; the rest render as muted, inert text.
+const visaLinks = await withBuiltFlag(visas);
+const employerLinks = await withBuiltFlag(employers);
+const legalLinks = await withBuiltFlag([
+  { href: '/complaints/', label: 'Complaints procedure' },
+  { href: '/privacy/', label: 'Privacy' },
+  { href: '/terms/', label: 'Terms of engagement' },
+]);
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><span class="i">i</span><span class="word">VISALAW</span></a>
+        <p>{SITE.legalName}, trading as {SITE.name}.</p>
+        <a class="iaa" href={SITE.iaaRegister}>Licensed by the <strong>Immigration Advisers Authority</strong></a>
+      </div>
+      <div><h4>Visas</h4><ul>
+        {visaLinks.map(l => <li>{l.ready ? <a href={l.href}>{l.label}</a> : <span class="soon">{l.label}</span>}</li>)}
+      </ul></div>
+      <div><h4>Employers</h4><ul>
+        {employerLinks.map(l => <li>{l.ready ? <a href={l.href}>{l.label}</a> : <span class="soon">{l.label}</span>}</li>)}
+      </ul></div>
+      <div><h4>Contact</h4><ul>
+        <li><a href={SITE.phoneHref}>{SITE.phone}</a></li>
+        <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li>{SITE.address.street}<br />{SITE.address.street2}<br />{SITE.address.locality} {SITE.address.postcode}</li>
+      </ul></div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; {year} {SITE.legalName}</span>
+      <span class="legal">{legalLinks.map((l, i) => (
+        <>{i > 0 && <span aria-hidden="true"> &middot; </span>}
+        {l.ready ? <a href={l.href}>{l.label}</a> : <span class="soon">{l.label}</span>}</>
+      ))}</span>
+    </div>
+  </div>
+</footer>

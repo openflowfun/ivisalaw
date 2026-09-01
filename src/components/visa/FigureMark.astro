@@ -1,0 +1,19 @@
+---
+import type { Figure } from '../../content.config';
+interface Props { figure: Figure }
+const { figure } = Astro.props;
+---
+<span class="figmark">
+  <span class="val">{figure.value}</span>
+  <span class="lbl">{figure.label}</span>
+  {figure.effective && <span class="eff">From {figure.effective}</span>}
+  {figure.note && <span class="note">{figure.note}</span>}
+</span>
+
+<style>
+  .figmark{display:block;margin-top:1.1rem;padding:.95rem 1.1rem;background:var(--white);border:1px solid var(--rule);border-left:2px solid var(--indigo);border-radius:0 4px 4px 0}
+  .val{display:block;font-family:var(--serif);font-size:1.5rem;font-weight:350;letter-spacing:-.025em;line-height:1.1;font-variant-numeric:tabular-nums}
+  .lbl{display:block;margin-top:.2rem;font-size:.84rem;font-weight:600;color:var(--ink-2)}
+  .eff{display:block;margin-top:.35rem;font-size:.78rem;color:var(--pounamu);font-weight:600}
+  .note{display:block;margin-top:.45rem;font-size:.8rem;color:var(--ink-3);line-height:1.55}
+</style>

@@ -1,0 +1,52 @@
+---
+import { SITE } from '../../lib/site';
+
+/*
+  IAA licence numbers are PLACEHOLDERS pending the client — build spec §6.
+  `licence: null` renders an em dash rather than inventing a number, and
+  case managers correctly show supervision instead of a licence.
+  Who is a licensed adviser vs. case manager is also still to be confirmed.
+*/
+const people = [
+  { name: 'Bob Fenwick', role: 'Director · Licensed Immigration Adviser', licence: '200800177' },
+  { name: 'Kanchana Kulasinghe', role: 'Licensed Immigration Adviser', licence: null },
+  { name: 'Imaya Munasinghe', role: 'Licensed Immigration Adviser', licence: null },
+  { name: 'Jessica Kim', role: 'Licensed Immigration Adviser', licence: null },
+  { name: 'Sakina Silva', role: 'Case Manager', licence: undefined },
+  { name: 'Julianne Lee', role: 'Case Manager', licence: undefined },
+];
+---
+<section class="team">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="wipe">The people who will handle your file</h2>
+      <p class="rv" data-d="1">Every licensed adviser in New Zealand holds a public licence you can verify. Ours are listed here, with links to the Immigration Advisers Authority register.</p>
+    </div>
+    <div class="team-grid glow-grid">
+      {people.map((p, i) => (
+        <div class="person glow rv" data-d={String(i + 1)}>
+          <h3>{p.name}</h3>
+          <div class="role">{p.role}</div>
+          <div class="lic">
+            {p.licence === undefined
+              ? 'Supervised by a licensed adviser'
+              : <>IAA {p.licence ?? '—'} &middot; <a href={SITE.iaaRegister}>Verify</a></>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .team{background:var(--white);border-top:1px solid var(--rule)}
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem 1.75rem}
+  .person{border-top:1px solid var(--rule);padding-top:1.35rem;padding-inline:.9rem;margin-inline:-.9rem;border-radius:4px;transition:border-color .5s var(--ease)}
+  .person:hover{border-top-color:var(--indigo)}
+  .person h3{font-family:var(--serif);font-size:1.38rem;font-weight:400}
+  .person .role{margin-top:.4rem;font-size:.9rem;color:var(--ink-2)}
+  .person .lic{margin-top:.85rem;font-size:.8rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+  @media (max-width:1000px){ .team-grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .team-grid{grid-template-columns:1fr} }
+</style>

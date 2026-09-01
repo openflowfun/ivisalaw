@@ -1,0 +1,32 @@
+---
+import Guilloche from '../Guilloche.astro';
+import { SITE } from '../../lib/site';
+---
+<div class="cta-band">
+  <Guilloche />
+  <div class="wrap">
+    <div>
+      <h2 class="wipe">Find out if you qualify before you commit to anything</h2>
+      <p class="rv" data-d="1">A one-hour assessment covers your history, your realistic options, the timeline and what it will cost. You leave with a written summary whether or not you engage us afterwards.</p>
+    </div>
+    <div class="cta-actions rv" data-d="2">
+      <a class="btn" href="/assessment/">Book an assessment</a>
+      <a class="alt" href={SITE.phoneHref}>Call {SITE.phone}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cta-band{background:var(--indigo);color:#fff;position:relative;overflow:hidden}
+  .cta-band :global(.guillo){opacity:.13;color:#fff;right:-14%;animation-duration:300s}
+  .cta-band .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(2rem,5vw,4.5rem);align-items:center;padding-block:clamp(3.5rem,7vw,5.5rem)}
+  .cta-band h2{font-family:var(--serif);font-size:clamp(2.1rem,3.8vw,3.1rem);color:#fff;letter-spacing:-.03em;font-weight:350}
+  .cta-band p{margin-top:1.2rem;color:#CFD8F5;max-width:46ch}
+  .cta-actions{display:flex;flex-direction:column;gap:.85rem}
+  .cta-actions .btn{background:#fff;color:var(--indigo-deep);text-align:center;padding:1.1rem;font-size:1rem}
+  .cta-actions .btn:hover{box-shadow:0 18px 34px -14px rgba(0,0,0,.4)}
+  .cta-actions .alt{color:#fff;text-align:center;font-size:.96rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.45);padding:1rem;border-radius:3px;transition:background .4s var(--ease),border-color .4s var(--ease)}
+  .cta-actions .alt:hover{border-color:#fff;background:rgba(255,255,255,.12)}
+
+  @media (max-width:1000px){ .cta-band .wrap{grid-template-columns:1fr} }
+</style>

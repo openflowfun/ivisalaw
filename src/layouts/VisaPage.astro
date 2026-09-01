@@ -1,0 +1,613 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from './Base.astro';
+import Guilloche from '../components/Guilloche.astro';
+import FigureMark from '../components/visa/FigureMark.astro';
+import MediaSlot from '../components/MediaSlot.astro';
+import CtaBand from '../components/home/CtaBand.astro';
+import { SITE } from '../lib/site';
+import { withBuiltFlag } from '../lib/routes';
+
+interface Props { entry: CollectionEntry<'visas'> }
+const { entry } = Astro.props;
+const d = entry.data;
+
+const sectionLabel: Record<string, string> = {
+  'work-visas': 'Work visas', residence: 'Residence', family: 'Family',
+  employers: 'Employers', study: 'Study', appeals: 'Appeals',
+};
+const sectionHref = `/${d.section}/`;
+const url = new URL(Astro.url.pathname, SITE.url).href;
+
+/*
+  Every figure on the page, gathered into one register so the client has a
+  single sign-off list (build spec §6) and the reader can see where each
+  number came from. `verified` is false until the client confirms it.
+*/
+const register = [
+  ...d.keyFigures.map(f => ({ ...f, where: 'Key figures' })),
+  ...d.eligibility.flatMap(e => (e.figure ? [{ ...e.figure, where: e.title }] : [])),
+  // Fees live in the cost table; only register the ones carrying a source of
+  // their own, so the register stays a policy-figure list and not a duplicate.
+  ...d.cost.filter(c => c.source).map(c => ({
+    value: c.amount, label: c.item, effective: undefined as string | undefined,
+    note: c.note, source: c.source, verified: c.verified, where: 'Cost',
+  })),
+];
+// Fees without their own source still need client sign-off.
+const unsourcedFees = d.cost.filter(c => !c.source && !c.verified).length;
+const unverified = register.filter(f => !f.verified).length + unsourcedFees;
+
+/*
+  Swimlane order follows first appearance in the process, so the reader
+  meets the lanes in the order the work actually happens. Derived rather
+  than hard-coded, because other visa pages have a different actor mix.
+*/
+const lanes = [...new Set(d.process.map(p => p.actor))];
+
+const relatedLinks = await withBuiltFlag(d.related);
+
+/*
+  Timeline bars compare stage *durations* against a shared scale. They
+  deliberately do not chain into a Gantt: the stages are sequential but
+  the start dates are not knowable, and drawing them as if they were
+  would be a precision we cannot support.
+*/
+const stages = d.timeline.filter(t => !t.isTotal);
+const totals = d.timeline.filter(t => t.isTotal);
+const scaleMax = Math.max(...d.timeline.map(t => t.maxWeeks ?? 0), 1);
+const pct = (w?: number) => `${Math.min(100, ((w ?? 0) / scaleMax) * 100)}%`;
+
+/* Fees are grouped by who actually pays them. */
+const costByPayer = (['You', 'Your employer', 'Either'] as const)
+  .map(payer => ({ payer, items: d.cost.filter(c => c.payer === payer) }))
+  .filter(g => g.items.length > 0);
+
+const schema = [
+  {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: d.faq.map(f => ({
+      '@type': 'Question', name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url + '/' },
+      { '@type': 'ListItem', position: 2, name: sectionLabel[d.section], item: SITE.url + sectionHref },
+      { '@type': 'ListItem', position: 3, name: d.navLabel, item: url },
+    ],
+  },
+];
+---
+<Base title={d.seoTitle} description={d.description} schema={schema}>
+
+  <!-- ══ MASTHEAD ══ -->
+  <section class="visa-head">
+    <Guilloche />
+    <div class="wrap">
+      <div class="head-grid">
+      <div class="head-copy">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span>
+        <a href={sectionHref}>{sectionLabel[d.section]}</a><span aria-hidden="true">/</span>
+        <span aria-current="page">{d.navLabel}</span>
+      </nav>
+      <h1 id="h1"><span class="ln"><span>{d.title}</span></span></h1>
+      <p class="standfirst rv" data-d="2">{d.intro}</p>
+      <p class="stamp rv" data-d="3">
+        Policy figures checked {d.policyChecked}. These change without notice —
+        <a href="https://www.immigration.govt.nz/">verify at immigration.govt.nz</a> before you lodge.
+      </p>
+      </div>
+      <MediaSlot media={d.media?.hero} label="Masthead" eager fallback="panel" class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ KEY FIGURES ══ -->
+  <div class="rules">
+    <div class="wrap">
+      <div class="rules-grid">
+        {d.keyFigures.map((f, i) => (
+          <div class="rule-cell rv" data-d={String((i % 4) + 1)}>
+            <div class="bar drawline"></div>
+            <div class="fig">{f.value}</div>
+            <div class="lbl">{f.label}</div>
+            {f.effective && <div class="eff">From {f.effective}</div>}
+            {f.note && <div class="sub">{f.note}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WHO IT'S FOR ══ -->
+  <section id="who">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Who it's for</h2>
+        <p class="rv" data-d="1">{d.whoItsFor.lead}</p>
+      </div>
+      <div class="fit-grid">
+        <div class="fit rv" data-d="1">
+          <h3><span class="tick" aria-hidden="true"></span>This is probably your visa if</h3>
+          <ul>{d.whoItsFor.fits.map(t => <li>{t}</li>)}</ul>
+        </div>
+        <div class="fit no rv" data-d="2">
+          <h3><span class="tick" aria-hidden="true"></span>It is probably not, if</h3>
+          <ul>{d.whoItsFor.doesntFit.map(t => <li>{t}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WIDE BAND SLOT ══ -->
+  <div class="band-media-wrap">
+    <div class="wrap">
+      <MediaSlot media={d.media?.band} label="Section band" fallback="band" ratio={2.8} class="band-media rv" sizes="100vw" />
+    </div>
+  </div>
+
+  <!-- ══ ELIGIBILITY ══ -->
+  <section id="eligibility" class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Eligibility</h2>
+        <p class="rv" data-d="1">All of these have to be satisfied. The weakest one decides the outcome.</p>
+      </div>
+      <ol class="crit">
+        {d.eligibility.map((e, i) => (
+          <li class="rv" data-d={String((i % 4) + 1)}>
+            <div class="n">{String(i + 1).padStart(2, '0')}</div>
+            <div class="c">
+              <h3>{e.title}</h3>
+              <p>{e.detail}</p>
+              {e.figure && <FigureMark figure={e.figure} />}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ PROCESS ══ -->
+  <section id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">The process</h2>
+        <p class="rv" data-d="1">Who does what, in order. Most of it sits with your employer before you can lodge anything.</p>
+      </div>
+      <div class="swim-wrap" style={`--lanes:${lanes.length}`}>
+        <div class="swim-heads rv" aria-hidden="true">
+          {lanes.map(lane => (
+            <div class="swim-head" data-actor={lane}>{lane}</div>
+          ))}
+        </div>
+        <ol class="swim glow-grid">
+          {d.process.map((s, i) => (
+            <li
+              class="swim-step glow rv"
+              data-actor={s.actor}
+              data-d={String((i % 4) + 1)}
+              style={`--lane:${lanes.indexOf(s.actor) + 1};--row:${i + 1}`}
+            >
+              <span class="sn">{String(i + 1).padStart(2, '0')}</span>
+              {/* The column carries the actor visually; this keeps it in the
+                  accessibility tree, and becomes a visible tag on mobile. */}
+              <span class="sa">{s.actor}</span>
+              <h3>{s.title}</h3>
+              <p>{s.detail}</p>
+              {s.duration && <span class="dur">{s.duration}</span>}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TIMELINE ══ -->
+  <section id="timeline" class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Timeline</h2>
+        <p class="rv" data-d="1">Planning figures, not guarantees. Each stage finishes before the next starts.</p>
+      </div>
+      <div class="chart rv" data-d="1">
+        <ol class="bars">
+          {stages.map(t => (
+            <li class="bar-row">
+              <div class="bar-label">
+                <span class="bar-stage">{t.stage}</span>
+                <span class="bar-dur">{t.duration}</span>
+              </div>
+              {t.maxWeeks != null ? (
+                <div class="bar" role="img" aria-label={`${t.stage}: ${t.duration}`}>
+                  <span class="bar-max" style={`width:${pct(t.maxWeeks)}`}></span>
+                  <span class="bar-min" style={`width:${pct(t.minWeeks)}`}></span>
+                </div>
+              ) : (
+                <div class="bar bar-none"></div>
+              )}
+              {t.note && <p class="bar-note">{t.note}</p>}
+            </li>
+          ))}
+        </ol>
+
+        {totals.map(t => (
+          <div class="bar-total">
+            <div class="bar-label">
+              <span class="bar-stage">{t.stage}</span>
+              <span class="bar-dur">{t.duration}</span>
+            </div>
+            <div class="bar" role="img" aria-label={`${t.stage}: ${t.duration}`}>
+              <span class="bar-max" style={`width:${pct(t.maxWeeks)}`}></span>
+              <span class="bar-min" style={`width:${pct(t.minWeeks)}`}></span>
+            </div>
+            {t.note && <p class="bar-note">{t.note}</p>}
+          </div>
+        ))}
+
+        <p class="chart-key">
+          <span class="k k-min"></span>Shortest realistic
+          <span class="k k-max"></span>Longest realistic
+          <span class="k-scale">Scale: 0–{scaleMax} weeks</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COST ══ -->
+  <section id="cost">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">What it costs</h2>
+        <p class="rv" data-d="1">Immigration New Zealand fees, in New Zealand dollars. Note how much sits with the employer.</p>
+      </div>
+      {d.costSummary && (
+        <div class="cost-split glow-grid">
+          {d.costSummary.map((c, i) => (
+            <div class:list={['cost-card', 'glow', c.payer === 'You' && 'mine', 'rv']} data-d={String(i + 1)}>
+              <span class="cs-payer">{c.payer === 'You' ? 'You pay' : 'Your employer pays'}</span>
+              <span class="cs-amount">{c.headline}</span>
+              <p class="cs-detail">{c.detail}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div class="tbl-scroll rv" data-d="2">
+        <table class="tbl">
+          <thead><tr><th scope="col">Item</th><th scope="col">Amount</th><th scope="col">Notes</th></tr></thead>
+          {costByPayer.map(group => (
+            <tbody>
+              <tr class="grp"><th scope="colgroup" colspan="3">{group.payer === 'You' ? 'You pay' : `${group.payer} pays`}</th></tr>
+              {group.items.map(c => (
+                <tr>
+                  <th scope="row">{c.item}</th>
+                  <td class="num">{c.amount}</td>
+                  <td class="note">{c.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WHAT GOES WRONG ══ -->
+  <div class="wrong-band">
+    <Guilloche />
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">What goes wrong</h2>
+        <p class="rv" data-d="1">The failures we actually see. Most are avoidable before anything is lodged.</p>
+      </div>
+      <div class="wrong-grid glow-grid">
+        {d.whatGoesWrong.map((w, i) => (
+          <article class="wrong glow glow-dark rv" data-d={String((i % 4) + 1)}>
+            <h3>{w.problem}</h3>
+            <p class="cons">{w.consequence}</p>
+            <p class="fix"><span>What to do</span>{w.fix}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FAQ ══ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Questions we get asked</h2>
+      </div>
+      <div class="faq rv" data-d="1">
+        {d.faq.map(f => (
+          <details name="faq">
+            <summary><span>{f.q}</span>
+              <svg width="14" height="9" viewBox="0 0 14 9" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.8"/></svg>
+            </summary>
+            <div class="ans"><p>{f.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ RELATED ══ -->
+  <section id="related" class="alt">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="wipe">Related pathways</h2></div>
+      <div class="svc-grid glow-grid">
+        {relatedLinks.map((r, i) => (
+          r.ready ? (
+            <a class="svc glow rv" data-d={String((i % 4) + 1)} href={r.href}>
+              <h3>{r.title}</h3>
+              <p>{r.note}</p>
+              <span class="go">Read more</span>
+            </a>
+          ) : (
+            <div class="svc soon rv" data-d={String((i % 4) + 1)}>
+              <h3>{r.title}</h3>
+              <p>{r.note}</p>
+              <span class="go">In preparation</span>
+            </div>
+          )
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FIGURE REGISTER ══ -->
+  <section id="figures" class="reg">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Where these figures come from</h2>
+        <p class="rv" data-d="1">
+          Every policy figure on this page, with its source. Check any number you are
+          relying on against the source on the day.
+        </p>
+      </div>
+      {import.meta.env.DEV && unverified > 0 && (
+        <p class="devwarn">
+          <strong>Pre-launch:</strong> {unverified} of {register.length} figures on this page are
+          not yet signed off by the client. Set <code>verified: true</code> in
+          <code>src/content/visas/{entry.id}.md</code> as each is confirmed.
+        </p>
+      )}
+      <div class="tbl-scroll rv" data-d="1">
+        <table class="tbl">
+          <thead><tr><th scope="col">Figure</th><th scope="col">What it governs</th><th scope="col">Effective</th><th scope="col">Source</th></tr></thead>
+          <tbody>
+            {register.map(f => (
+              <tr>
+                <th scope="row" class="num">{f.value}</th>
+                <td>{f.label}</td>
+                <td class="note">{f.effective ?? '—'}</td>
+                <td>{f.source
+                  ? <a href={f.source} rel="nofollow">immigration.govt.nz</a>
+                  : <span class="note">Adviser assessment</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="disclaimer rv" data-d="2">
+        General information, not immigration advice for your situation. Only a licensed
+        immigration adviser or a lawyer can advise on your own case. Last reviewed
+        {' '}{d.updated.toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  /* ── masthead ─────────────────────────────────────────── */
+  .visa-head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(2.5rem,5vw,4rem)}
+  .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
+  .crumb a{color:var(--ink-3);text-decoration:none}
+  .crumb a:hover{color:var(--indigo);text-decoration:underline}
+  .crumb span[aria-current]{color:var(--ink)}
+  .visa-head h1{font-family:var(--serif);font-size:clamp(2.4rem,5.2vw,4.1rem);letter-spacing:-.032em;line-height:1.04;font-weight:350;max-width:16ch}
+  .visa-head h1 .ln{display:block;overflow:hidden}
+  .visa-head h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  .visa-head h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.6rem;font-size:1.16rem;color:var(--ink-2);max-width:56ch}
+  .visa-head .stamp{margin-top:1.9rem;padding-top:1.2rem;border-top:1px solid var(--rule);font-size:.85rem;color:var(--ink-3);max-width:62ch}
+
+  /* ── key figures strip (shares the homepage language) ── */
+  .rules{background:var(--white);border-block:1px solid var(--rule)}
+  .rules .wrap{padding-block:clamp(2.25rem,4vw,3.2rem)}
+  .rules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem 0}
+  .rule-cell{padding:0 1.6rem 0 0;border-right:1px solid var(--rule);margin-right:1.6rem}
+  .rule-cell:nth-child(3n){border-right:0;margin-right:0;padding-right:0}
+  .rule-cell .bar{height:2px;background:var(--indigo);margin-bottom:1.15rem}
+  .rule-cell .fig{font-family:var(--serif);font-size:clamp(1.7rem,2.6vw,2.3rem);letter-spacing:-.035em;line-height:1;font-weight:350;font-variant-numeric:tabular-nums}
+  .rule-cell .lbl{margin-top:.75rem;font-size:.9rem;font-weight:600}
+  .rule-cell .eff{margin-top:.3rem;font-size:.79rem;color:var(--pounamu);font-weight:600}
+  .rule-cell .sub{margin-top:.35rem;font-size:.83rem;color:var(--ink-3);line-height:1.55}
+
+  section.alt{background:var(--white);border-top:1px solid var(--rule)}
+  section.alt + section.alt{border-top:1px solid var(--rule)}
+
+  /* ── who it's for ─────────────────────────────────────── */
+  .fit-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .fit{background:var(--white);padding:1.9rem 1.75rem}
+  .fit h3{display:flex;align-items:center;gap:.6rem;font-size:.92rem;font-weight:700;letter-spacing:0;color:var(--pounamu)}
+  .fit.no h3{color:var(--ink-3)}
+  .fit .tick{width:1.35rem;height:1.35rem;border-radius:50%;background:var(--pounamu-bg);flex-shrink:0;position:relative}
+  .fit .tick::after{content:"";position:absolute;left:.42rem;top:.28rem;width:.28rem;height:.55rem;border:solid var(--pounamu);border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+  .fit.no .tick{background:var(--rule)}
+  .fit.no .tick::after{left:.38rem;top:.6rem;width:.55rem;height:0;border-width:0 0 1.6px 0;border-color:var(--ink-3);transform:none}
+  .fit ul{list-style:none;margin:1.35rem 0 0;padding:0;display:flex;flex-direction:column;gap:.85rem}
+  .fit li{font-size:.96rem;color:var(--ink-2);padding-left:1rem;position:relative;line-height:1.6}
+  .fit li::before{content:"";position:absolute;left:0;top:.62em;width:4px;height:4px;border-radius:50%;background:var(--rule)}
+
+  /* ── numbered criteria + process steps ───────────────── */
+  .crit,.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .crit li,.steps li{display:grid;grid-template-columns:5.5rem 1fr;gap:1.5rem;padding:2rem 0;border-top:1px solid var(--rule)}
+  .crit li:last-child,.steps li:last-child{border-bottom:1px solid var(--rule)}
+  .crit .n,.steps .n{font-family:var(--serif);font-size:1.6rem;color:var(--indigo);font-weight:350;line-height:1;font-variant-numeric:tabular-nums}
+  .crit h3,.steps h3{font-family:var(--serif);font-size:1.5rem;font-weight:400;letter-spacing:-.02em}
+  .crit p,.steps p{margin-top:.75rem;color:var(--ink-2);max-width:62ch;font-size:1rem}
+
+  /* ── masthead media ───────────────────────────────────── */
+  .head-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(2rem,5vw,4rem);align-items:end}
+  .head-media{align-self:stretch;min-height:100%}
+
+  /* ── wide band media ──────────────────────────────────── */
+  .band-media-wrap{padding-block:clamp(2rem,4vw,3rem)}
+
+  /* ── process swimlane ─────────────────────────────────────
+     Lanes make the point the old numbered list buried: almost
+     none of this work is the applicant's. */
+  .swim-wrap{--swim-gap:1.15rem}
+  .swim-heads{display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:var(--swim-gap);margin-bottom:1rem}
+  .swim-head{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-bottom:.65rem;border-bottom:2px solid var(--rule)}
+  .swim-head[data-actor="You"]{color:var(--indigo);border-bottom-color:var(--indigo)}
+
+  .swim{display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:var(--swim-gap);list-style:none;margin:0;padding:0}
+  .swim-step{grid-column:var(--lane);grid-row:var(--row);background:var(--white);border:1px solid var(--rule);border-top:2px solid var(--rule);border-radius:4px;padding:1.2rem 1.15rem;transition:border-color .5s var(--ease),transform .5s var(--ease)}
+  .swim-step[data-actor="You"]{border-top-color:var(--indigo)}
+  .swim-step .sn{display:block;font-family:var(--serif);font-size:1.3rem;font-weight:350;color:var(--indigo);line-height:1;font-variant-numeric:tabular-nums;margin-bottom:.5rem}
+  /* Column position carries the actor on desktop; keep it for AT. */
+  .swim-step .sa{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .swim-step h3{font-family:var(--serif);font-size:1.22rem;font-weight:400;letter-spacing:-.02em;line-height:1.25}
+  .swim-step p{margin-top:.6rem;font-size:.93rem;color:var(--ink-2);line-height:1.6}
+  .swim-step .dur{display:inline-block;margin-top:.9rem;font-size:.78rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.28rem .6rem;border-radius:3px}
+
+  /* ── timeline bar chart ───────────────────────────────── */
+  .chart{border:1px solid var(--rule);border-radius:6px;background:var(--white);padding:1.5rem 1.6rem}
+  .bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.35rem}
+  .bar-label{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.5rem}
+  .bar-stage{font-size:.95rem;font-weight:600}
+  .bar-dur{font-size:.85rem;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar{position:relative;height:10px;background:var(--paper);border-radius:100px;overflow:hidden}
+  .bar-max{position:absolute;inset-block:0;left:0;background:var(--indigo);opacity:.28;border-radius:100px}
+  .bar-min{position:absolute;inset-block:0;left:0;background:var(--indigo);border-radius:100px}
+  .bar-none{background:repeating-linear-gradient(90deg,var(--paper) 0 6px,transparent 6px 12px)}
+  .bar-note{margin-top:.5rem;font-size:.83rem;color:var(--ink-3);line-height:1.55}
+
+  .bar-total{margin-top:1.6rem;padding-top:1.4rem;border-top:1px solid var(--rule)}
+  .bar-total .bar-stage{font-family:var(--serif);font-size:1.2rem;font-weight:400}
+  .bar-total .bar-dur{font-weight:600;color:var(--ink)}
+  .bar-total .bar{height:14px}
+  .bar-total .bar-min{background:var(--indigo-deep)}
+
+  .chart-key{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem 1.1rem;margin-top:1.5rem;padding-top:1.1rem;border-top:1px solid var(--rule);font-size:.79rem;color:var(--ink-3)}
+  .k{width:.85rem;height:.5rem;border-radius:100px;background:var(--indigo);display:inline-block;margin-right:-.6rem}
+  .k-max{opacity:.28}
+  .k-scale{margin-left:auto;font-variant-numeric:tabular-nums}
+
+  /* ── cost split ───────────────────────────────────────── */
+  .cost-split{display:grid;grid-template-columns:repeat(2,1fr);gap:1.15rem;margin-bottom:1.6rem}
+  .cost-card{background:var(--white);border:1px solid var(--rule);border-top:2px solid var(--rule);border-radius:4px;padding:1.5rem 1.4rem}
+  .cost-card.mine{border-top-color:var(--indigo)}
+  .cs-payer{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .cost-card.mine .cs-payer{color:var(--indigo)}
+  .cs-amount{display:block;margin-top:.55rem;font-family:var(--serif);font-size:clamp(1.9rem,3vw,2.5rem);font-weight:350;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+  .cs-detail{margin-top:.85rem;font-size:.9rem;color:var(--ink-2);line-height:1.6}
+
+  .tbl tbody tr.grp th{background:var(--paper);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-block:.6rem}
+
+  /* ── tables ───────────────────────────────────────────── */
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--white)}
+  .tbl{width:100%;border-collapse:collapse;font-size:.93rem;min-width:34rem}
+  .tbl th,.tbl td{text-align:left;padding:.95rem 1.15rem;border-bottom:1px solid var(--rule);vertical-align:top}
+  .tbl thead th{font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);background:var(--paper);white-space:nowrap}
+  .tbl tbody tr:last-child th,.tbl tbody tr:last-child td{border-bottom:0}
+  .tbl tbody th{font-weight:600;color:var(--ink)}
+  .tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+  .tbl .note{color:var(--ink-3);font-size:.87rem;line-height:1.55}
+  .payer{font-size:.76rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  .payer.you{color:var(--indigo)}
+
+  /* ── what goes wrong ─────────────────────────────────── */
+  .wrong-band{background:var(--ink);color:#fff;position:relative;overflow:hidden;padding-block:clamp(4rem,8vw,7rem)}
+  .wrong-band :global(.guillo){opacity:.055;left:-22%;right:auto;color:#fff;animation-duration:340s;animation-direction:reverse}
+  .wrong-band .wrap{position:relative}
+  .wrong-band .sec-head h2{color:#fff}
+  .wrong-band .sec-head p{color:#AEB9D8}
+  .wrong-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden}
+  .wrong{background:var(--ink);padding:1.9rem 1.75rem;transition:background .5s var(--ease)}
+  .wrong:hover{background:var(--ink-lift)}
+  .wrong h3{font-family:var(--serif);font-size:1.32rem;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.25}
+  .wrong .cons{margin-top:.85rem;font-size:.94rem;color:#AEB9D8;line-height:1.65}
+  .wrong .fix{margin-top:1.15rem;padding-top:1.05rem;border-top:1px solid rgba(255,255,255,.13);font-size:.94rem;color:#fff;line-height:1.65}
+  .wrong .fix span{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--indigo-lite);margin-bottom:.45rem}
+
+  /* ── faq ──────────────────────────────────────────────── */
+  .faq{border-top:1px solid var(--rule)}
+  .faq details{border-bottom:1px solid var(--rule)}
+  .faq summary{display:flex;justify-content:space-between;align-items:center;gap:1.5rem;padding:1.35rem 0;cursor:pointer;list-style:none;font-size:1.08rem;font-weight:500;color:var(--ink);transition:color .3s var(--ease)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary:hover{color:var(--indigo)}
+  .faq summary svg{flex-shrink:0;color:var(--indigo);transition:transform .45s var(--ease)}
+  .faq details[open] summary svg{transform:rotate(180deg)}
+  .faq .ans{padding:0 0 1.5rem}
+  .faq .ans p{color:var(--ink-2);max-width:68ch;font-size:1rem}
+
+  /* ── related (reuses the homepage service card) ───────── */
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .svc{background:var(--paper);padding:1.85rem 1.65rem;display:flex;flex-direction:column;gap:.6rem;text-decoration:none;color:inherit;position:relative;transition:background .5s var(--ease)}
+  .svc::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:var(--indigo);transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
+  a.svc:hover{background:var(--white)}
+  a.svc:hover::before{transform:scaleX(1)}
+  .svc.soon{opacity:.62}
+  .svc.soon h3{color:var(--ink-2)}
+  .svc.soon .go{color:var(--ink-3);font-weight:500}
+  .svc h3{font-family:var(--serif);font-size:1.3rem;font-weight:400}
+  .svc p{font-size:.92rem;color:var(--ink-2);flex-grow:1}
+  .svc .go{font-size:.86rem;font-weight:600;color:var(--indigo)}
+
+  /* ── register ─────────────────────────────────────────── */
+  .reg{background:var(--white);border-top:1px solid var(--rule)}
+  .reg .tbl-scroll{background:var(--paper)}
+  .reg .tbl thead th{background:var(--white)}
+  .devwarn{margin-bottom:1.5rem;padding:.9rem 1.1rem;border:1px solid var(--indigo);border-left-width:3px;border-radius:0 4px 4px 0;background:var(--white);font-size:.88rem;color:var(--ink-2);line-height:1.6}
+  .devwarn code{font-size:.85em;background:var(--paper);padding:.1rem .35rem;border-radius:2px;border:1px solid var(--rule)}
+  .disclaimer{margin-top:1.75rem;font-size:.85rem;color:var(--ink-3);max-width:70ch;line-height:1.65}
+
+  /* ── responsive ───────────────────────────────────────── */
+  @media (max-width:1000px){
+    .rules-grid{grid-template-columns:repeat(2,1fr)}
+    .rule-cell:nth-child(3n){border-right:1px solid var(--rule);margin-right:1.6rem}
+    .rule-cell:nth-child(2n){border-right:0;margin-right:0;padding-right:0}
+    .svc-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:900px){
+    .head-grid{grid-template-columns:1fr}
+    /* Swimlane collapses to a single ordered column; the actor label
+       stops being implied by position and becomes a visible tag. */
+    .swim-heads{display:none}
+    .swim{grid-template-columns:1fr;gap:.85rem}
+    .swim-step{grid-column:1!important;grid-row:auto!important;position:relative}
+    .swim-step .sa{position:static;width:auto;height:auto;margin:0;clip-path:none;
+      display:inline-block;margin-bottom:.55rem;font-size:.68rem;font-weight:700;letter-spacing:.05em;
+      text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule);padding:.2rem .45rem;border-radius:3px}
+    .swim-step[data-actor="You"] .sa{color:var(--indigo);border-color:var(--indigo)}
+    .swim-step .sn{display:inline-block;margin-right:.6rem}
+  }
+  @media (max-width:760px){
+    .fit-grid{grid-template-columns:1fr}
+    .wrong-grid{grid-template-columns:1fr}
+    .cost-split{grid-template-columns:1fr}
+    .chart{padding:1.25rem 1.15rem}
+    .k-scale{margin-left:0;width:100%}
+  }
+  @media (max-width:640px){
+    .rules-grid{grid-template-columns:1fr;gap:1.6rem}
+    .rule-cell,.rule-cell:nth-child(3n),.rule-cell:nth-child(2n){border-right:0;margin-right:0;padding-right:0}
+    .svc-grid{grid-template-columns:1fr}
+    .crit li,.steps li{grid-template-columns:1fr;gap:.85rem;padding:1.6rem 0}
+    .steps .meta{flex-direction:row;align-items:center;gap:.85rem}
+    .crit h3,.steps h3{font-size:1.28rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .visa-head h1 .ln>span{transform:none!important}
+  }
+</style>

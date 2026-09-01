@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import VisaPage from '../../layouts/VisaPage.astro';
+
+export async function getStaticPaths() {
+  const visas = await getCollection('visas', v => v.data.section === 'work-visas');
+  return visas.map(entry => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+<VisaPage entry={entry} />

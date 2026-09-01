@@ -1,0 +1,47 @@
+---
+import Guilloche from '../Guilloche.astro';
+import TriagePanel from './TriagePanel.astro';
+---
+<section class="hero">
+  <Guilloche />
+  <div class="wrap">
+    <div>
+      <span class="kicker rv"><i></i>Licensed by the Immigration Advisers Authority</span>
+      <h1 id="h1">
+        <span class="ln"><span>We tell you where you stand</span></span>
+        <span class="ln"><span>before you pay us</span></span>
+        <span class="ln"><span>to find out.</span></span>
+      </h1>
+      <p class="hero-body rv" data-d="3">Immigration New Zealand changed the rules four times in the last eighteen months. We read every one of them, so you never have to guess whether your case is worth filing.</p>
+      <div class="hero-meta rv" data-d="4">
+        <span>Central Auckland since 2008</span>
+        <span>Six licensed advisers</span>
+      </div>
+    </div>
+    <TriagePanel />
+  </div>
+</section>
+
+<style>
+  .hero{position:relative;padding:clamp(2.25rem,5vw,4.25rem) 0 clamp(3.5rem,7vw,6rem);overflow:hidden}
+  .hero .wrap{position:relative;display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(2rem,5vw,5rem);align-items:start}
+  .kicker{display:inline-flex;align-items:center;gap:.6rem;font-size:.85rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.45rem .95rem;border-radius:100px;margin-bottom:2rem}
+  .kicker i{width:7px;height:7px;border-radius:50%;background:var(--pounamu);flex-shrink:0;position:relative}
+  .kicker i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--pounamu);opacity:.5;animation:pulse 2.8s var(--ease) infinite}
+  @keyframes pulse{0%{transform:scale(.7);opacity:.7}70%,100%{transform:scale(1.5);opacity:0}}
+  h1{font-family:var(--serif);font-size:clamp(2.7rem,5.6vw,4.55rem);letter-spacing:-.032em;line-height:1.03;font-weight:350;max-width:13.5ch}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  h1.in .ln>span{transform:none}
+  h1 .ln:nth-child(2)>span{transition-delay:.1s}
+  h1 .ln:nth-child(3)>span{transition-delay:.2s}
+  .hero-body{margin-top:2rem;font-size:1.16rem;color:var(--ink-2);max-width:50ch}
+  .hero-meta{margin-top:2.6rem;padding-top:1.5rem;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:.6rem 2.2rem;font-size:.89rem;color:var(--ink-3)}
+
+  @media (max-width:1000px){
+    .hero .wrap{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    h1 .ln>span{transform:none!important}
+  }
+</style>

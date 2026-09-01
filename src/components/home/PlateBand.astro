@@ -1,0 +1,27 @@
+---
+import Plate from '../Plate.astro';
+
+/*
+  A full-bleed statement band between the pinned pathway and the services
+  grid. Breaks the centred-column rhythm the build spec flags in §2, and
+  gives the eye somewhere to rest between two dense sections.
+*/
+---
+<aside class="plate-band">
+  <Plate variant="band" />
+  <div class="wrap">
+    <p class="rv">
+      <span class="wipe"><span class="ln">Immigration is a paper exercise.</span></span>
+      <span class="dim">The law is only half of it. The rest is evidence, assembled in the right order, before anyone asks for it.</span>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .plate-band{position:relative;overflow:hidden;background:var(--ink);color:var(--indigo-lite);padding-block:clamp(4rem,9vw,7.5rem)}
+  .plate-band .wrap{position:relative}
+  .plate-band p{max-width:34ch}
+  .plate-band .wipe{display:block;overflow:hidden}
+  .plate-band .ln{display:block;font-family:var(--serif);font-size:clamp(2rem,4.4vw,3.4rem);font-weight:350;letter-spacing:-.03em;line-height:1.1;color:#fff}
+  .plate-band .dim{display:block;margin-top:1.25rem;font-size:1.05rem;line-height:1.7;color:#AEB9D8;max-width:44ch}
+</style>

@@ -1,0 +1,71 @@
+---
+import { withBuiltFlag } from '../../lib/routes';
+
+const services = [
+  { href: '/work-visas/aewv/', title: 'Accredited Employer Work Visa',
+    body: 'The main route for skilled workers. Job token, market rate, skill level and English requirements, all checked before we lodge.',
+    go: 'AEWV requirements' },
+  { href: '/residence/skilled-migrant/', title: 'Skilled Migrant residence',
+    body: 'Six-point assessment, NZQA qualification mapping, and the experience-based pathways that opened in August 2026.',
+    go: 'Residence pathways' },
+  { href: '/residence/green-list/', title: 'Green List', tag: 'Fastest route',
+    body: "Tier 1 occupations go straight to residence. Tier 2 works toward it. We'll tell you honestly which list you're on.",
+    go: 'Check the Green List' },
+  { href: '/family/partner/', title: 'Partner and family visas',
+    body: 'Partnership applications turn on evidence of a genuine and stable relationship. Most declines are evidentiary, not factual.',
+    go: 'Partner and family' },
+  { href: '/employers/accreditation/', title: 'Employer accreditation',
+    body: 'Standard through to triangular accreditation, Job Checks, re-accreditation, and responding to Immigration NZ audits.',
+    go: 'For employers' },
+  { href: '/appeals/', title: 'Declines and section 61',
+    body: 'Declined, or unlawfully in New Zealand? There are options, and they are time-limited. Come to us early rather than late.',
+    go: 'Declines and appeals' },
+];
+
+const items = await withBuiltFlag(services);
+---
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="wipe">What we handle</h2>
+      <p class="rv" data-d="1">Every matter starts with a paid assessment. If the answer is that you don't qualify yet, we say so, and tell you what would change that.</p>
+    </div>
+    <div class="svc-grid glow-grid">
+      {items.map((s, i) => (
+        s.ready ? (
+          <a class="svc glow rv" data-d={String(i + 1)} href={s.href}>
+            {s.tag && <span class="tag">{s.tag}</span>}
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+            <span class="go">{s.go}</span>
+          </a>
+        ) : (
+          <div class="svc soon rv" data-d={String(i + 1)}>
+            {s.tag && <span class="tag">{s.tag}</span>}
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+            <span class="go">In preparation</span>
+          </div>
+        )
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .svc{background:var(--paper);padding:2rem 1.75rem;display:flex;flex-direction:column;gap:.7rem;text-decoration:none;color:inherit;position:relative;transition:background .5s var(--ease)}
+  .svc::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:var(--indigo);transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
+  a.svc:hover{background:var(--white)}
+  a.svc:hover::before{transform:scaleX(1)}
+  .svc.soon{opacity:.62}
+  .svc.soon h3{color:var(--ink-2)}
+  .svc.soon .go{color:var(--ink-3);font-weight:500}
+  .svc h3{font-family:var(--serif);font-size:1.42rem;font-weight:400}
+  .svc p{font-size:.94rem;color:var(--ink-2);flex-grow:1}
+  .svc .go{font-size:.88rem;font-weight:600;color:var(--indigo)}
+  .svc .tag{align-self:flex-start;font-size:.74rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.24rem .6rem;border-radius:3px}
+
+  @media (max-width:1000px){ .svc-grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .svc-grid{grid-template-columns:1fr} }
+</style>

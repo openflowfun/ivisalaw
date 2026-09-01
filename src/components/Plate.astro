@@ -1,0 +1,33 @@
+---
+import band from '../assets/plates/band.svg?raw';
+import panel from '../assets/plates/panel.svg?raw';
+import quiet from '../assets/plates/quiet.svg?raw';
+
+/*
+  An engraved guilloche plate, used as section artwork.
+
+  Inlined rather than served as <img> so the strokes inherit `currentColor`
+  and the same file works as indigo on paper or white on the ink ground.
+
+  These exist because the brand already has a graphic language — the hero
+  guilloche — and extending it costs nothing, scales to any size, weighs a
+  few KB, and can never be mistaken for a photograph of a real place or
+  person. Photography, when it arrives, sits on top of this rather than
+  replacing it.
+*/
+const PLATES = { band, panel, quiet } as const;
+
+interface Props {
+  variant?: keyof typeof PLATES;
+  class?: string;
+}
+const { variant = 'band', class: extra } = Astro.props;
+---
+<div class:list={['plate', extra]} aria-hidden="true">
+  <Fragment set:html={PLATES[variant]} />
+</div>
+
+<style>
+  .plate{position:absolute;inset:0;overflow:hidden;pointer-events:none;display:grid;place-items:center}
+  .plate :global(svg){width:min(150%,1100px);height:auto;flex-shrink:0;color:inherit}
+</style>

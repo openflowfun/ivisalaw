@@ -1,0 +1,86 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import GuillocheDefs from '../components/GuillocheDefs.astro';
+import { SITE } from '../lib/site';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Omit to derive from the current URL. */
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  /** JSON-LD graph nodes to emit in <head>. */
+  schema?: Record<string, unknown>[];
+}
+
+const isPreview = import.meta.env.PUBLIC_PREVIEW === 'true';
+
+const {
+  title,
+  description,
+  canonical = new URL(Astro.url.pathname, SITE.url).href,
+  ogTitle = title,
+  ogDescription = description,
+  schema = [],
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+  <meta name="theme-color" content="#3852B3" />
+
+  {/*
+    Any build that is not the live ivisalaw.co.nz site must not be indexed.
+    A pre-launch preview of a licensed adviser's site — carrying placeholder
+    IAA licence numbers and policy figures the client has not signed off —
+    competing with or being mistaken for their real site in search results
+    would be a genuine problem, not a cosmetic one. Set PUBLIC_PREVIEW=true
+    for every preview deploy.
+  */}
+  {isPreview && <meta name="robots" content="noindex, nofollow" />}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,300..600&family=Public+Sans:ital,wght@0,300..700;1,400&display=swap"
+    rel="stylesheet"
+  />
+
+  {schema.map(node => (
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(node)} />
+  ))}
+
+  <ClientRouter />
+</head>
+<body>
+  <div id="prog" aria-hidden="true"></div>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <GuillocheDefs />
+  <Header />
+
+  <main id="main">
+    <slot />
+  </main>
+
+  <Footer />
+
+  <script>
+    import { boot } from '../scripts/site';
+    boot();
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+---
+/*
+  Hero triage — the highest-intent element on the page. Four starting
+  points, each expanding to the real sequence rather than a marketing
+  blurb. Accordion is a plain button + grid-rows transition so it works
+  without JS beyond the aria wiring.
+*/
+const routes = [
+  {
+    id: 'p1',
+    label: "I'm overseas with a job offer",
+    steps: [
+      'Your employer must already hold <b>Immigration NZ accreditation</b>. Check before you sign anything.',
+      'They run a <b>Job Check</b> and issue you a job token. Without it, nothing can be lodged.',
+      'You apply for the <b>Accredited Employer Work Visa</b>: 30+ hours a week, at market rate for the role.',
+      'Time on the AEWV builds the New Zealand experience that residence later depends on.',
+    ],
+    cta: { href: '/work-visas/aewv/', label: 'Read the AEWV requirements in full' },
+  },
+  {
+    id: 'p2',
+    label: "I'm in New Zealand and want residence",
+    steps: [
+      'If your job is <b>Green List Tier 1</b>, you may go straight to residence without waiting.',
+      'Otherwise the <b>Skilled Migrant Category</b> applies: six points from registration, qualification or income.',
+      'Short of six? New Zealand work experience closes the gap, and the August 2026 reforms shortened how much you need.',
+      'New <b>Skilled Work Experience</b> and <b>Trades &amp; Technician</b> pathways now cover people without a degree.',
+    ],
+    cta: { href: '/residence/', label: 'See which residence pathway fits you' },
+  },
+  {
+    id: 'p3',
+    label: 'I want to bring my partner or children',
+    steps: [
+      "Whether you can support them turns on your <b>role's skill level</b>, not on your visa type alone.",
+      'Partner support carries an income threshold tied to the immigration median wage.',
+      'Dependent children can study as domestic students while you hold an eligible visa.',
+      "If you can't support them, they may still qualify in their own right. Worth checking before you assume not.",
+    ],
+    cta: { href: '/family/', label: 'Partner and dependent child visas' },
+  },
+  {
+    id: 'p4',
+    label: "I'm a New Zealand employer",
+    steps: [
+      '<b>Accreditation</b> first: standard, high-volume, franchisee or triangular, depending on how you hire.',
+      '<b>Job Check</b> per role, including advertising and, for lower-skilled roles, engagement with Work and Income.',
+      'Your candidate then applies. Errors at your end delay theirs.',
+      'We also handle re-accreditation and audit responses, which are getting stricter.',
+    ],
+    cta: { href: '/employers/', label: 'Employer accreditation and Job Check' },
+  },
+];
+---
+<div class="triage rv" data-d="2">
+  <div class="triage-head">
+    <h2>Where are you starting from?</h2>
+    <p>Pick the one that fits. We'll show you the route and what it actually requires right now.</p>
+  </div>
+  <div class="triage-opts">
+    {routes.map(r => (
+      <>
+        <button class="opt" aria-expanded="false" aria-controls={r.id}>{r.label}
+          <svg class="chev" width="14" height="9" viewBox="0 0 14 9" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.8"/></svg></button>
+        <div class="panel" id={r.id}><div><ol>
+          {r.steps.map(s => <li set:html={s} />)}
+        </ol><a class="panel-cta" href={r.cta.href}>{r.cta.label}</a></div></div>
+      </>
+    ))}
+  </div>
+</div>
+
+<style>
+  .triage{position:relative;background:var(--ink);color:#fff;border-radius:6px;overflow:hidden;box-shadow:0 40px 80px -40px rgba(12,21,48,.65),0 2px 0 rgba(255,255,255,.05) inset}
+  .triage-head{padding:1.9rem 1.9rem 1.35rem;border-bottom:1px solid rgba(255,255,255,.13);position:relative}
+  .triage-head h2{font-family:var(--serif);font-size:1.72rem;color:#fff;letter-spacing:-.025em;font-weight:350}
+  .triage-head p{font-size:.9rem;color:#9DAACC;margin-top:.6rem;max-width:38ch}
+  .triage-opts{padding:1.2rem 1.9rem 1.9rem;display:flex;flex-direction:column;gap:.55rem;position:relative}
+  .opt{width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;font-family:var(--sans);font-size:.99rem;font-weight:500;padding:1rem 1.15rem;border-radius:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:background .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease)}
+  .opt:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.32);transform:translateX(3px)}
+  .opt[aria-expanded="true"]{background:var(--indigo);border-color:var(--indigo-lite);transform:none}
+  .opt .chev{flex-shrink:0;transition:transform .5s var(--ease)}
+  .opt[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
+  .panel.open{grid-template-rows:1fr}
+  .panel>div{overflow:hidden}
+  .panel :global(ol){margin:0;padding:.35rem 0 0;list-style:none;counter-reset:step}
+  .panel :global(li){counter-increment:step;position:relative;padding:.68rem 0 .68rem 2.45rem;font-size:.93rem;color:#BFC8E2;border-bottom:1px solid rgba(255,255,255,.08)}
+  .panel :global(li)::before{content:counter(step);position:absolute;left:0;top:.78rem;width:1.6rem;height:1.6rem;border:1px solid rgba(255,255,255,.28);border-radius:50%;display:grid;place-items:center;font-size:.72rem;color:#fff;font-weight:600}
+  .panel :global(li b){color:#fff;font-weight:600}
+  .panel .panel-cta{display:inline-block;margin-top:1rem;color:#fff;font-size:.92rem;font-weight:600;text-decoration-color:rgba(255,255,255,.4)}
+</style>

@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import RulesStrip from '../components/home/RulesStrip.astro';
+import PinnedPathway from '../components/home/PinnedPathway.astro';
+import Services from '../components/home/Services.astro';
+import Team from '../components/home/Team.astro';
+import CtaBand from '../components/home/CtaBand.astro';
+import PlateBand from '../components/home/PlateBand.astro';
+import { SITE } from '../lib/site';
+
+const schema = [{
+  '@context': 'https://schema.org',
+  '@type': 'LegalService',
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: SITE.url,
+  telephone: SITE.phone,
+  email: SITE.email,
+  areaServed: 'NZ',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${SITE.address.street}, ${SITE.address.street2}`,
+    addressLocality: SITE.address.locality,
+    postalCode: SITE.address.postcode,
+    addressCountry: SITE.address.country,
+  },
+}];
+---
+<Base
+  title="Licensed Immigration Advisers in Auckland | iVISALAW"
+  description="IAA-licensed immigration advisers in central Auckland. Honest eligibility assessments for AEWV work visas, Skilled Migrant residence, partner and family visas, and employer accreditation."
+  ogDescription="We tell you where you stand before you pay us to find out."
+  schema={schema}
+>
+  <Hero />
+  <RulesStrip />
+  <PinnedPathway />
+  <PlateBand />
+  <Services />
+  <Team />
+  <CtaBand />
+</Base>

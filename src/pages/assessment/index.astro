@@ -1,0 +1,198 @@
+---
+import Base from '../../layouts/Base.astro';
+import Guilloche from '../../components/Guilloche.astro';
+import { SITE, PENDING } from '../../lib/site';
+
+/*
+  The conversion page. Every CTA on the site points here: the header
+  button, all four hero triage panels, and the CTA band on every page.
+
+  The fee is a CLIENT TO SUPPLY item (build spec §6) and is deliberately
+  not invented. Rather than show a fake number or an empty space, the page
+  states plainly that the fee is confirmed when booking — and the dev-only
+  notice below makes sure this doesn't quietly ship that way.
+*/
+const FEE = PENDING.consultationFee;
+
+const steps = [
+  { n: '01', title: 'You tell us where you are now',
+    body: 'Your current visa, your work history, your qualifications, your family situation, and anything that has gone wrong before. Declines and overstays included — especially those.' },
+  { n: '02', title: 'We tell you where you actually stand',
+    body: 'Which pathways are open to you, which are not, and which would be if something changed. If the answer is that you do not qualify yet, you hear that in the first meeting rather than after paying for an application.' },
+  { n: '03', title: 'You leave with it in writing',
+    body: 'A written summary of your options, the realistic timeline, what each route costs, and what we would do next. It is yours whether or not you engage us afterwards.' },
+];
+
+const covers = [
+  'Which visa or residence pathway realistically fits your circumstances',
+  'What evidence you would need, and what you are missing today',
+  'Realistic timelines, based on current Immigration New Zealand processing',
+  'What the whole thing costs, including Immigration New Zealand fees and ours',
+  'Whether your employer needs accreditation, and where that leaves you',
+  'What to do if you have been declined before, or are unlawfully here',
+];
+
+const schema = [{
+  '@context': 'https://schema.org', '@type': 'Service',
+  serviceType: 'Immigration eligibility assessment',
+  provider: { '@type': 'LegalService', name: SITE.name, url: SITE.url },
+  areaServed: 'NZ',
+}];
+---
+<Base
+  title="Book an Immigration Assessment in Auckland | iVISALAW"
+  description="A one-hour assessment with a licensed immigration adviser. Your realistic options, the timeline and the cost, in writing — whether or not you engage us afterwards."
+  schema={schema}
+>
+  <section class="head">
+    <Guilloche />
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span>
+        <span aria-current="page">Assessment</span>
+      </nav>
+      <div class="head-grid">
+        <div>
+          <h1 id="h1"><span class="ln"><span>Find out where you stand</span></span></h1>
+          <p class="standfirst rv" data-d="2">
+            A one-hour assessment with a licensed adviser. You leave knowing whether your case
+            is worth filing — which is not the same as us telling you it is.
+          </p>
+        </div>
+        <div class="book rv" data-d="3">
+          <span class="book-label">Book an assessment</span>
+          {FEE
+            ? <span class="book-fee">{FEE}</span>
+            : <span class="book-fee tbc">Fee confirmed when you book</span>}
+          <a class="btn" href={SITE.phoneHref}>Call {SITE.phone}</a>
+          <a class="alt" href={`mailto:${SITE.email}?subject=Assessment%20enquiry`}>Email {SITE.email}</a>
+          <p class="book-note">
+            In person at our High Street office, or by video call if you are offshore.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {import.meta.env.DEV && !FEE && (
+    <div class="wrap"><p class="devwarn">
+      <strong>Pre-launch:</strong> the consultation fee is still a client to-supply item
+      (build spec §6). Set <code>PENDING.consultationFee</code> in <code>src/lib/site.ts</code>
+      once confirmed — the page currently says "fee confirmed when you book" rather than
+      showing a number.
+    </p></div>
+  )}
+
+  <section class="how alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">How it works</h2>
+      </div>
+      <ol class="steps glow-grid">
+        {steps.map((s, i) => (
+          <li class="step glow rv" data-d={String(i + 1)}>
+            <span class="sn">{s.n}</span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="covers">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">What it covers</h2>
+        <p class="rv" data-d="1">
+          One hour, and we use all of it. Bring your passport, any previous visa decisions,
+          and your employment history.
+        </p>
+      </div>
+      <ul class="cover-list rv" data-d="1">
+        {covers.map(c => <li>{c}</li>)}
+      </ul>
+      <p class="honest rv" data-d="2">
+        If we think you do not have a case, we will say so and you will not be charged for
+        work we do not believe in. That is the whole point of charging for the assessment
+        rather than giving it away and recovering it on the application.
+      </p>
+    </div>
+  </section>
+
+  <div class="cta-band">
+    <Guilloche />
+    <div class="wrap">
+      <div>
+        <h2 class="wipe">Ready when you are</h2>
+        <p class="rv" data-d="1">
+          Call during office hours, or email and we will come back to you with the next
+          available times.
+        </p>
+      </div>
+      <div class="cta-actions rv" data-d="2">
+        <a class="btn" href={SITE.phoneHref}>Call {SITE.phone}</a>
+        <a class="alt" href={`mailto:${SITE.email}?subject=Assessment%20enquiry`}>Email us</a>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(2.5rem,5vw,4rem)}
+  .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
+  .crumb a{color:var(--ink-3);text-decoration:none}
+  .crumb a:hover{color:var(--indigo);text-decoration:underline}
+  .crumb span[aria-current]{color:var(--ink)}
+  .head-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(2rem,5vw,4rem);align-items:start}
+  h1{font-family:var(--serif);font-size:clamp(2.4rem,5.2vw,4rem);letter-spacing:-.032em;line-height:1.04;font-weight:350;max-width:13ch}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.6rem;font-size:1.16rem;color:var(--ink-2);max-width:52ch}
+
+  .book{background:var(--ink);color:#fff;border-radius:6px;padding:1.9rem 1.75rem;display:flex;flex-direction:column;gap:.85rem;box-shadow:0 40px 80px -40px rgba(12,21,48,.65)}
+  .book-label{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9DAACC}
+  .book-fee{font-family:var(--serif);font-size:clamp(1.9rem,3vw,2.4rem);font-weight:350;letter-spacing:-.03em;line-height:1;color:#fff}
+  .book-fee.tbc{font-size:1.05rem;color:#BFC8E2;font-family:var(--sans);letter-spacing:0}
+  .book .btn{background:#fff;color:var(--indigo-deep);text-align:center;padding:1rem;font-size:1rem;margin-top:.35rem}
+  .book .alt{color:#fff;text-align:center;font-size:.94rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.45);padding:.9rem;border-radius:3px;transition:background .4s var(--ease),border-color .4s var(--ease)}
+  .book .alt:hover{border-color:#fff;background:rgba(255,255,255,.12)}
+  .book-note{margin-top:.4rem;font-size:.85rem;color:#9DAACC;line-height:1.6}
+
+  .devwarn{margin-block:1.5rem;padding:.9rem 1.1rem;border:1px solid var(--indigo);border-left-width:3px;border-radius:0 4px 4px 0;background:var(--white);font-size:.88rem;color:var(--ink-2);line-height:1.6}
+  .devwarn code{font-size:.85em;background:var(--paper);padding:.1rem .35rem;border-radius:2px;border:1px solid var(--rule)}
+
+  section.alt{background:var(--white);border-top:1px solid var(--rule)}
+  .steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem}
+  .step{background:var(--paper);border:1px solid var(--rule);border-top:2px solid var(--indigo);border-radius:4px;padding:1.6rem 1.5rem}
+  .sn{display:block;font-family:var(--serif);font-size:1.5rem;font-weight:350;color:var(--indigo);line-height:1;margin-bottom:.7rem;font-variant-numeric:tabular-nums}
+  .step h3{font-family:var(--serif);font-size:1.28rem;font-weight:400;letter-spacing:-.02em;line-height:1.25}
+  .step p{margin-top:.7rem;font-size:.94rem;color:var(--ink-2);line-height:1.65}
+
+  .cover-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem 2.5rem;border-top:1px solid var(--rule);padding-top:1.6rem}
+  .cover-list li{position:relative;padding-left:1.5rem;font-size:.98rem;color:var(--ink-2);line-height:1.6}
+  .cover-list li::before{content:"";position:absolute;left:0;top:.52em;width:.5rem;height:.5rem;border-radius:50%;background:var(--indigo)}
+  .honest{margin-top:2.25rem;padding-top:1.6rem;border-top:1px solid var(--rule);max-width:62ch;color:var(--ink-2)}
+
+  .cta-band{background:var(--indigo);color:#fff;position:relative;overflow:hidden}
+  .cta-band :global(.guillo){opacity:.13;color:#fff;right:-14%}
+  .cta-band .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(2rem,5vw,4.5rem);align-items:center;padding-block:clamp(3.5rem,7vw,5.5rem)}
+  .cta-band h2{font-family:var(--serif);font-size:clamp(2.1rem,3.8vw,3.1rem);color:#fff;letter-spacing:-.03em;font-weight:350}
+  .cta-band p{margin-top:1.2rem;color:#CFD8F5;max-width:46ch}
+  .cta-actions{display:flex;flex-direction:column;gap:.85rem}
+  .cta-actions .btn{background:#fff;color:var(--indigo-deep);text-align:center;padding:1.1rem;font-size:1rem}
+  .cta-actions .alt{color:#fff;text-align:center;font-size:.96rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.45);padding:1rem;border-radius:3px;transition:background .4s var(--ease),border-color .4s var(--ease)}
+  .cta-actions .alt:hover{border-color:#fff;background:rgba(255,255,255,.12)}
+
+  @media (max-width:1000px){
+    .head-grid,.cta-band .wrap{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+  }
+  @media (max-width:640px){
+    .cover-list{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    h1 .ln>span{transform:none!important}
+  }
+</style>

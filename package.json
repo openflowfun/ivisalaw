@@ -1,0 +1,24 @@
+{
+  "name": "ivisalaw-nz",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "npm run check:content && astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check:content": "sh scripts/check-frontmatter.sh"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.10",
+    "lenis": "^1.3.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "zod": "^4.5.4"
+  }
+}

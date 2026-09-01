@@ -1,0 +1,100 @@
+---
+import Guilloche from '../Guilloche.astro';
+
+/*
+  The signature scroll moment. 420vh of track drives a sticky stage;
+  scroll progress maps to one of four panes. Unpins entirely below
+  1000px and under reduced motion, where the panes stack and read as
+  a plain list — see the media queries below and the matching
+  innerWidth > 1000 guard in scripts/site.ts.
+
+  Per spec §2: do not add a second pinned section anywhere on the site.
+*/
+const stages = [
+  { n: '01', title: 'Get here lawfully',
+    body: 'A work, student or visitor visa with conditions you can actually meet. The wrong first visa quietly closes doors two years later, and by then it is expensive to undo.',
+    dur: 'Typically 4–10 weeks' },
+  { n: '02', title: 'Build the record',
+    body: 'Skilled employment at the right wage, held continuously. This is the evidence every residence decision is actually made on, and it is built long before you apply.',
+    dur: 'Typically 2 years' },
+  { n: '03', title: 'Apply for residence',
+    body: 'Skilled Migrant Category, Green List, or a partnership-based application. Each is assessed on different grounds, and choosing the wrong one costs you months.',
+    dur: 'Typically 6–12 months' },
+  { n: '04', title: 'Make it permanent',
+    body: 'A resident visa carries travel conditions. A permanent resident visa does not. It is the step people forget, and the one that strands them offshore when it lapses.',
+    dur: 'After 2 years as a resident' },
+];
+---
+<div class="pin-outer">
+  <Guilloche />
+  <div class="wrap intro">
+    <div class="sec-head">
+      <h2 class="wipe">Nobody arrives on a resident visa</h2>
+      <p class="rv" data-d="1">Residence is the end of a sequence, not the start of one. Knowing which stage you're at, and what the next one demands, is most of the work.</p>
+    </div>
+  </div>
+  <div class="pin-track" id="pinTrack">
+    <div class="pin-stage">
+      <div class="wrap">
+        <div class="rail" id="rail">
+          {stages.map((s, i) => (
+            <button class:list={['rail-item', i === 0 && 'on']} data-i={String(i)}>{s.title}</button>
+          ))}
+        </div>
+        <div class="stage-panes" id="panes">
+          {stages.map((s, i) => (
+            <div class:list={['pane', i === 0 && 'on']}>
+              <div class="num">{s.n}</div>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+              <span class="dur">{s.dur}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pin-outer{background:var(--ink);color:#fff;position:relative}
+  .pin-outer :global(.guillo){opacity:.055;left:-18%;right:auto;color:#fff;animation-duration:340s;animation-direction:reverse}
+  .intro{padding-top:clamp(4rem,8vw,7rem)}
+  .intro .sec-head{margin-bottom:0}
+  .intro .sec-head h2{color:#fff}
+  .intro .sec-head p{color:#AEB9D8}
+
+  .pin-track{height:420vh;position:relative}
+  .pin-stage{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+  .pin-stage .wrap{width:100%;display:grid;grid-template-columns:.34fr .66fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative}
+  .rail{display:flex;flex-direction:column;gap:0;border-left:1px solid rgba(255,255,255,.18);padding-left:1.9rem;position:relative}
+  .rail::before{content:"";position:absolute;left:-1px;top:0;width:2px;background:var(--indigo-lite);height:var(--fill,0%);transition:height .35s linear}
+  .rail-item{padding:.85rem 0;font-size:.92rem;color:#68769E;position:relative;transition:color .5s var(--ease);cursor:pointer;background:none;border:0;font-family:var(--sans);text-align:left}
+  .rail-item::before{content:"";position:absolute;left:calc(-1.9rem - 4px);top:1.25rem;width:7px;height:7px;border-radius:50%;background:#2A3763;transition:background .5s var(--ease),transform .5s var(--ease)}
+  .rail-item.on{color:#fff;font-weight:600}
+  .rail-item.on::before{background:var(--indigo-lite);transform:scale(1.6)}
+  .stage-panes{position:relative;min-height:340px}
+  .pane{position:absolute;inset:0;opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .75s var(--ease);pointer-events:none}
+  .pane.on{opacity:1;transform:none;pointer-events:auto}
+  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;color:rgba(255,255,255,.15);font-weight:300;letter-spacing:-.05em}
+  .pane h3{font-family:var(--serif);font-size:clamp(2rem,4.2vw,3.1rem);margin-top:-.16em;font-weight:350;letter-spacing:-.03em;color:#fff}
+  .pane p{margin-top:1.3rem;color:#AEB9D8;font-size:1.08rem;max-width:48ch}
+  .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px}
+
+  /* Unpin: the pinned section must not survive below 1000px. */
+  @media (max-width:1000px){
+    .pin-track{height:auto}
+    .pin-stage{position:static;height:auto;padding-block:1rem}
+    .pin-stage .wrap{grid-template-columns:1fr}
+    .rail{display:none}
+    .stage-panes{position:static;min-height:0;display:flex;flex-direction:column;gap:3rem}
+    .pane{position:static;opacity:1;transform:none;pointer-events:auto}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .pin-track{height:auto}
+    .pin-stage{position:static;height:auto}
+    .stage-panes{position:static;display:flex;flex-direction:column;gap:3rem;min-height:0}
+    .pane{position:static;opacity:1;transform:none;pointer-events:auto}
+    .rail{display:none}
+  }
+</style>

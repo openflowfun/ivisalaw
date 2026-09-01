@@ -1,0 +1,68 @@
+---
+/*
+  The four figures every application is measured against. Values are
+  duplicated as text content and data-count so the numbers are correct
+  with JS off and animate up when it's on.
+
+  CLIENT VERIFICATION: every figure here needs sign-off before launch.
+  See src/content/visas/ figures[] for the same discipline on visa pages.
+*/
+const stamp = '1 September 2026';
+
+const figures = [
+  { value: '$35.00', count: '35', pre: '$', dec: '2',
+    label: 'Immigration median wage',
+    sub: 'From 9 March 2026. Sets Green List pay floors, partner support and Skilled Migrant thresholds.' },
+  { value: '$23.95', count: '23.95', pre: '$', dec: '2',
+    label: 'Adult minimum wage',
+    sub: 'From 1 April 2026. AEWV pay must meet this and the market rate for the role.' },
+  { value: '6', count: '6', dec: '0',
+    label: 'Points to apply under SMC',
+    sub: 'From occupational registration, an NZQF qualification, or income, topped up with NZ work experience.' },
+  { value: '5 yrs', count: '5', post: ' yrs', dec: '0',
+    label: 'Maximum AEWV stay',
+    sub: 'For skilled roles. Shorter durations apply lower down the National Occupation List.' },
+];
+---
+<div class="rules">
+  <div class="wrap">
+    <div class="rules-top">
+      <h2 class="rv">The numbers your application is measured against</h2>
+      <span class="stamp rv" data-d="1">Checked {stamp} &middot; verify at immigration.govt.nz before lodging</span>
+    </div>
+    <div class="rules-grid">
+      {figures.map((f, i) => (
+        <div class="rule-cell rv" data-d={String(i + 1)}>
+          <div class="bar drawline" data-d={i > 0 ? String(i) : undefined}></div>
+          <div class="fig" data-count={f.count} data-pre={f.pre} data-post={f.post} data-dec={f.dec}>{f.value}</div>
+          <div class="lbl">{f.label}</div>
+          <div class="sub">{f.sub}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .rules{background:var(--white);border-block:1px solid var(--rule)}
+  .rules .wrap{padding-block:clamp(2.5rem,5vw,3.6rem)}
+  .rules-top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1.9rem}
+  .rules-top h2{font-family:var(--serif);font-size:1.6rem;font-weight:350}
+  .rules-top .stamp{font-size:.82rem;color:var(--ink-3)}
+  .rules-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .rule-cell{padding:0 1.6rem 0 0;border-right:1px solid var(--rule);margin-right:1.6rem}
+  .rule-cell:last-child{border-right:0;margin-right:0;padding-right:0}
+  .rule-cell .bar{height:2px;background:var(--indigo);margin-bottom:1.15rem}
+  .rule-cell .fig{font-family:var(--serif);font-size:clamp(2.1rem,3.4vw,2.9rem);letter-spacing:-.035em;line-height:1;font-weight:350;font-variant-numeric:tabular-nums}
+  .rule-cell .lbl{margin-top:.75rem;font-size:.9rem;font-weight:600}
+  .rule-cell .sub{margin-top:.35rem;font-size:.83rem;color:var(--ink-3);line-height:1.55}
+
+  @media (max-width:1000px){
+    .rules-grid{grid-template-columns:repeat(2,1fr);gap:1.75rem}
+    .rule-cell:nth-child(2){border-right:0;margin-right:0}
+  }
+  @media (max-width:640px){
+    .rules-grid{grid-template-columns:1fr}
+    .rule-cell{border-right:0;margin-right:0;padding-right:0}
+  }
+</style>

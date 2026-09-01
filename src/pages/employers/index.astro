@@ -1,0 +1,8 @@
+---
+import { getEntry } from 'astro:content';
+import SectionPage from '../../layouts/SectionPage.astro';
+
+const entry = await getEntry('sections', 'employers');
+if (!entry) throw new Error('Missing section content: src/content/sections/employers.md');
+---
+<SectionPage entry={entry} />

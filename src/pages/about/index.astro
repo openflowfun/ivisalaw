@@ -1,0 +1,128 @@
+---
+import Base from '../../layouts/Base.astro';
+import Guilloche from '../../components/Guilloche.astro';
+import Team from '../../components/home/Team.astro';
+import CtaBand from '../../components/home/CtaBand.astro';
+import MediaSlot from '../../components/MediaSlot.astro';
+import { SITE } from '../../lib/site';
+
+const principles = [
+  { title: 'We tell you before you pay us to find out',
+    body: 'Every matter starts with a paid assessment, and the assessment can end with us saying no. That is not a failure of the process, it is the process working.' },
+  { title: 'We read the instructions, not the summaries',
+    body: 'Immigration New Zealand changed the rules four times in eighteen months. Advice built on last year’s settings is worse than no advice, because it is confident.' },
+  { title: 'Every figure on this site is dated and sourced',
+    body: 'Thresholds move. Each page carries the date its figures were checked and links to the source, so you can verify anything you are relying on.' },
+  { title: 'You can check our licences yourself',
+    body: 'Every licensed immigration adviser in New Zealand appears on a public register. Ours are listed with links, and you should check them — for us and for anyone else you consider.' },
+];
+
+const schema = [{
+  '@context': 'https://schema.org', '@type': 'AboutPage',
+  mainEntity: {
+    '@type': 'LegalService', name: SITE.name, legalName: SITE.legalName,
+    url: SITE.url, telephone: SITE.phone, email: SITE.email, areaServed: 'NZ',
+  },
+}];
+---
+<Base
+  title="About iVISALAW — Licensed Immigration Advisers in Auckland"
+  description="NZ Visa and Immigration Advisers Limited, trading as iVISALAW NZ. IAA-licensed immigration advisers in central Auckland since 2008."
+  schema={schema}
+>
+  <section class="head">
+    <Guilloche />
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span aria-hidden="true">/</span>
+        <span aria-current="page">About</span>
+      </nav>
+      <div class="head-grid">
+        <div>
+          <h1 id="h1"><span class="ln"><span>A small firm that says no</span></span></h1>
+          <p class="standfirst rv" data-d="2">
+            {SITE.legalName}, trading as {SITE.name}. Licensed immigration advisers in
+            central Auckland since 2008.
+          </p>
+          <div class="meta rv" data-d="3">
+            <span>Central Auckland since 2008</span>
+            <span>Six licensed advisers</span>
+          </div>
+        </div>
+        <MediaSlot label="Office" fallback="panel" ratio={1.15} class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="principles alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">How we work</h2>
+      </div>
+      <div class="grid glow-grid">
+        {principles.map((p, i) => (
+          <div class="card glow rv" data-d={String(i + 1)}>
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Team />
+
+  <section class="where">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="wipe">Where to find us</h2>
+      </div>
+      <div class="addr rv">
+        <div>
+          <h3>Office</h3>
+          <p>{SITE.address.street}<br />{SITE.address.street2}<br />{SITE.address.locality} {SITE.address.postcode}</p>
+        </div>
+        <div>
+          <h3>Contact</h3>
+          <p><a href={SITE.phoneHref}>{SITE.phone}</a><br /><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+        </div>
+        <div>
+          <h3>Licensing</h3>
+          <p>Licensed by the Immigration Advisers Authority.<br />
+            <a href={SITE.iaaRegister}>Check the public register</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  .head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(2.5rem,5vw,4rem)}
+  .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
+  .crumb a{color:var(--ink-3);text-decoration:none}
+  .crumb a:hover{color:var(--indigo);text-decoration:underline}
+  .crumb span[aria-current]{color:var(--ink)}
+  .head-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(2rem,5vw,4rem);align-items:end}
+  h1{font-family:var(--serif);font-size:clamp(2.4rem,5.4vw,4.2rem);letter-spacing:-.032em;line-height:1.04;font-weight:350;max-width:12ch}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.6rem;font-size:1.16rem;color:var(--ink-2);max-width:52ch}
+  .meta{margin-top:2rem;padding-top:1.4rem;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:.6rem 2.2rem;font-size:.89rem;color:var(--ink-3)}
+
+  section.alt{background:var(--white);border-top:1px solid var(--rule)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.15rem}
+  .card{background:var(--paper);border:1px solid var(--rule);border-top:2px solid var(--indigo);border-radius:4px;padding:1.7rem 1.6rem}
+  .card h3{font-family:var(--serif);font-size:1.3rem;font-weight:400;letter-spacing:-.02em;line-height:1.28}
+  .card p{margin-top:.75rem;font-size:.95rem;color:var(--ink-2);line-height:1.65}
+
+  .addr{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;border-top:1px solid var(--rule);padding-top:1.75rem}
+  .addr h3{font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.7rem}
+  .addr p{font-size:.98rem;color:var(--ink-2);line-height:1.75}
+
+  @media (max-width:1000px){ .head-grid{grid-template-columns:1fr} }
+  @media (max-width:760px){ .grid,.addr{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ h1 .ln>span{transform:none!important} }
+</style>
