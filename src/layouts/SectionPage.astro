@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
+import { resolveLink } from '../lib/routes';
 import Base from './Base.astro';
 import Guilloche from '../components/Guilloche.astro';
 import MediaSlot from '../components/MediaSlot.astro';
@@ -18,17 +18,14 @@ const d = entry.data;
   the first day, never emits a dead link, and needs no manual updating as
   pages are written.
 */
-const visas = await getCollection('visas');
-const built = new Set(visas.map(v => `/${v.data.section}/${v.id}/`));
-
-const pathways = d.pathways.map(p => {
-  const href = p.href ?? (p.slug ? `/${d.section}/${p.slug}/` : undefined);
-  return { ...p, href, ready: href ? built.has(href) || !href.startsWith(`/${d.section}/`) : false };
-});
-// External-section links (href given explicitly) are only "ready" if built too.
-for (const p of pathways) {
-  if (p.href && !p.href.startsWith(`/${d.section}/`)) p.ready = built.has(p.href);
-}
+const here = `/${d.section}/`;
+const pathways = await Promise.all(
+  d.pathways.map(async p => {
+    const target = p.href ?? (p.slug ? `/${d.section}/${p.slug}/` : '');
+    const r = target ? await resolveLink(target, here) : { state: 'pending' as const };
+    return { ...p, ...r };
+  }),
+);
 
 const url = new URL(Astro.url.pathname, SITE.url).href;
 const schema = [{
@@ -63,12 +60,14 @@ const schema = [{
       <p class="lead rv">{d.lead}</p>
       <div class="svc-grid glow-grid">
         {pathways.map((p, i) => (
-          p.ready && p.href ? (
-            <a class="svc glow rv" data-d={String((i % 4) + 1)} href={p.href}>
+          p.href ? (
+            <a class:list={['svc glow rv', p.state === 'parent' && 'via']} data-d={String((i % 4) + 1)} href={p.href}>
               {p.tag && <span class="tag">{p.tag}</span>}
               <h3>{p.title}</h3>
               <p>{p.note}</p>
-              <span class="go">Read more</span>
+              {p.state === 'parent'
+                ? <span class="go">See {p.parentLabel}<em>Detailed page in preparation</em></span>
+                : <span class="go">Read more</span>}
             </a>
           ) : (
             <div class="svc soon rv" data-d={String((i % 4) + 1)}>
@@ -136,6 +135,11 @@ const schema = [{
   .svc .tag{align-self:flex-start;font-size:.74rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.24rem .6rem;border-radius:3px}
 
   /* Declared but not yet written. Reads as planned, not broken. */
+  /* Links to the parent section because the specific page is unwritten.
+     Full opacity — it is a real destination — but labelled so nobody
+     expects the detail page. */
+  .svc.via h3{color:var(--ink)}
+  .svc.via .go em{display:block;margin-top:.2rem;font-style:normal;font-weight:400;font-size:.8rem;color:var(--ink-3)}
   .svc.soon{opacity:.62}
   .svc.soon h3{color:var(--ink-2)}
   .svc.soon .go{color:var(--ink-3);font-weight:500}

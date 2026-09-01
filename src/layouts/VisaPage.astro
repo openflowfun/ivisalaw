@@ -45,7 +45,7 @@ const unverified = register.filter(f => !f.verified).length + unsourcedFees;
 */
 const lanes = [...new Set(d.process.map(p => p.actor))];
 
-const relatedLinks = await withBuiltFlag(d.related);
+const relatedLinks = await withBuiltFlag(d.related, Astro.url.pathname);
 
 /*
   Timeline bars compare stage *durations* against a shared scale. They
@@ -343,10 +343,12 @@ const schema = [
       <div class="svc-grid glow-grid">
         {relatedLinks.map((r, i) => (
           r.ready ? (
-            <a class="svc glow rv" data-d={String((i % 4) + 1)} href={r.href}>
+            <a class:list={['svc glow rv', r.state === 'parent' && 'via']} data-d={String((i % 4) + 1)} href={r.href}>
               <h3>{r.title}</h3>
               <p>{r.note}</p>
-              <span class="go">Read more</span>
+              {r.state === 'parent'
+                ? <span class="go">See {r.parentLabel}<em>Detailed page in preparation</em></span>
+                : <span class="go">Read more</span>}
             </a>
           ) : (
             <div class="svc soon rv" data-d={String((i % 4) + 1)}>
@@ -557,6 +559,7 @@ const schema = [
   .svc::before{content:"";position:absolute;left:0;top:0;height:2px;width:100%;background:var(--indigo);transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
   a.svc:hover{background:var(--white)}
   a.svc:hover::before{transform:scaleX(1)}
+  .svc.via .go em{display:block;margin-top:.2rem;font-style:normal;font-weight:400;font-size:.8rem;color:var(--ink-3)}
   .svc.soon{opacity:.62}
   .svc.soon h3{color:var(--ink-2)}
   .svc.soon .go{color:var(--ink-3);font-weight:500}
