@@ -93,7 +93,10 @@ const visas = defineCollection({
     })).min(1),
 
     process: z.array(z.object({
-      actor: z.enum(['You', 'Your employer', 'Immigration NZ']),
+      /* "You" is whoever the page addresses — the applicant on a visa page,
+         the business on an employer page — so employer pages need a way to
+         name the worker's side of the process. */
+      actor: z.enum(['You', 'Your employer', 'Your candidate', 'Immigration NZ']),
       title: z.string(),
       detail: z.string(),
       duration: z.string().optional(),

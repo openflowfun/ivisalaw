@@ -457,10 +457,12 @@ const schema = [
   .swim-heads{display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:var(--swim-gap);margin-bottom:1rem}
   .swim-head{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-bottom:.65rem;border-bottom:2px solid var(--rule)}
   .swim-head[data-actor="You"]{color:var(--indigo);border-bottom-color:var(--indigo)}
+  .swim-head[data-actor="Your candidate"]{color:var(--pounamu);border-bottom-color:var(--pounamu)}
 
   .swim{display:grid;grid-template-columns:repeat(var(--lanes),1fr);gap:var(--swim-gap);list-style:none;margin:0;padding:0}
   .swim-step{grid-column:var(--lane);grid-row:var(--row);background:var(--white);border:1px solid var(--rule);border-top:2px solid var(--rule);border-radius:4px;padding:1.2rem 1.15rem;transition:border-color .5s var(--ease),transform .5s var(--ease)}
   .swim-step[data-actor="You"]{border-top-color:var(--indigo)}
+  .swim-step[data-actor="Your candidate"]{border-top-color:var(--pounamu)}
   .swim-step .sn{display:block;font-family:var(--serif);font-size:1.3rem;font-weight:350;color:var(--indigo);line-height:1;font-variant-numeric:tabular-nums;margin-bottom:.5rem}
   /* Column position carries the actor on desktop; keep it for AT. */
   .swim-step .sa{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -578,6 +580,7 @@ const schema = [
       display:inline-block;margin-bottom:.55rem;font-size:.68rem;font-weight:700;letter-spacing:.05em;
       text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule);padding:.2rem .45rem;border-radius:3px}
     .swim-step[data-actor="You"] .sa{color:var(--indigo);border-color:var(--indigo)}
+    .swim-step[data-actor="Your candidate"] .sa{color:var(--pounamu);border-color:var(--pounamu)}
     .swim-step .sn{display:inline-block;margin-right:.6rem}
   }
   @media (max-width:760px){

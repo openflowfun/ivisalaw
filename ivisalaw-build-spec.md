@@ -164,8 +164,10 @@ Logo stays as supplied. Palette is built around it, not over it.
    and every CTA on the site 404'd, and the client could not click through anything.
 5. **In progress** — remaining visa and employer pages, plus `/complaints/`, `/privacy/`,
    `/terms/` (the three legal pages are linked from the footer sitewide and need client copy)
-   - done: `/work-visas/aewv/`, `/residence/green-list/`, `/residence/skilled-migrant/`
-   - next: `/employers/accreditation/`, `/employers/job-check/`, then family and the rest
+   - done: `/work-visas/aewv/`, `/residence/green-list/`, `/residence/skilled-migrant/`,
+     `/employers/accreditation/`, `/employers/job-check/`
+   - next: `/family/partner/`, `/family/dependent-children/`, `/residence/partnership/`,
+     `/employers/audits/`, then post-study, study and appeals
 6. Eligibility checker
 7. Sveltia CMS wiring + client editing guide
 8. Sinhala / Tamil / Korean routes
