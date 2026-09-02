@@ -1,7 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Guilloche from '../../components/Guilloche.astro';
-import MediaSlot from '../../components/MediaSlot.astro';
+import BgMedia from '../../components/BgMedia.astro';
 import { SITE, PENDING } from '../../lib/site';
 import type { Media } from '../../content.config';
 
@@ -9,10 +8,11 @@ import type { Media } from '../../content.config';
    renders only once real hours are set, so nothing false ships. */
 const HOURS = PENDING.officeHours;
 
+/* Sits behind the masthead rather than as a strip beneath it. */
 const strip: Media = {
   src: 'contact-strip.jpg',
   alt: 'A row of heritage and modern building facades on a central Auckland street, with street trees and pedestrians on the footpath.',
-  ratio: 3.2,
+  ratio: 1.5,
   duotone: false,
 };
 
@@ -35,7 +35,7 @@ const schema = [{
   schema={schema}
 >
   <section class="head">
-    <Guilloche />
+    <BgMedia media={strip} scrim="light" anchor="left" eager sizes="100vw" />
     <div class="wrap">
       <nav class="crumb" aria-label="Breadcrumb">
         <a href="/">Home</a><span aria-hidden="true">/</span>
@@ -74,7 +74,6 @@ const schema = [{
         </dl>
       )}
 
-      <MediaSlot media={strip} label="Office exterior" fallback="quiet" ratio={3.2} class="map rv" sizes="100vw" />
 
       <p class="note rv" data-d="4">
         We are licensed immigration advisers, not a law firm. If your matter needs a lawyer
@@ -93,7 +92,8 @@ const schema = [{
 </Base>
 
 <style>
-  .head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(3.5rem,7vw,6rem)}
+  .head{position:relative;overflow:hidden;isolation:isolate;padding-block:clamp(2.5rem,5vw,4rem) clamp(3.5rem,7vw,6rem)}
+  .head .wrap{position:relative;z-index:1}
   .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
   .crumb a{color:var(--ink-3);text-decoration:none}
   .crumb a:hover{color:var(--indigo);text-decoration:underline}

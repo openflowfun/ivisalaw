@@ -1,0 +1,104 @@
+---
+import { Picture } from 'astro:assets';
+import type { Media } from '../content.config';
+
+/*
+  A photograph used as a section background rather than as a picture.
+
+  The whole problem here is legibility: this site sets dark navy body copy
+  on paper, and a bright city photograph behind it destroys the contrast
+  that makes the type readable. So every background carries a scrim — a
+  gradient of the section's own ground colour, heaviest where the text sits
+  and lightest where it does not.
+
+  That is why the gradient is directional rather than a flat wash: a flat
+  overlay strong enough to protect the text would flatten the image to
+  nothing everywhere else. This way the copy side stays effectively solid
+  and the image reads clearly in the open space beside it.
+
+  The stops are not arbitrary: the copy column ends at roughly 53% of the
+  hero, so the scrim holds near-solid to there and only opens up beyond it.
+  Contrast was measured against the actual composited pixels rather than
+  estimated — see the note in the commit.
+
+  The host element needs `position:relative` and no background of its own.
+*/
+interface Props {
+  media: Media;
+  /** `light` protects dark text; `dark` protects white text. */
+  scrim?: 'light' | 'dark';
+  /** Where the copy sits, so the scrim knows which side to protect. */
+  anchor?: 'left' | 'full';
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+}
+const {
+  media,
+  scrim = 'light',
+  anchor = 'left',
+  eager = false,
+  sizes = '100vw',
+  class: extra,
+} = Astro.props;
+
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/**/*.{avif,webp,png,jpg,jpeg}');
+const resolved = images[`/src/assets/${media.src}`];
+const img = resolved ? (await resolved()).default : undefined;
+---
+{img && (
+  <div class:list={['bg', scrim, anchor, extra]} aria-hidden="true">
+    <Picture
+      src={img}
+      alt=""
+      formats={['avif', 'webp']}
+      fallbackFormat="jpeg"
+      widths={[600, 1000, 1400, 1536]}
+      sizes={sizes}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding={eager ? 'sync' : 'async'}
+      fetchpriority={eager ? 'high' : 'auto'}
+    />
+    <span class="scrim"></span>
+  </div>
+)}
+
+<style>
+  .bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  .bg :global(img){width:100%;height:100%;object-fit:cover;object-position:center 38%}
+  .scrim{position:absolute;inset:0}
+
+  /* Dark copy on paper. Solid where the text is, opening up to the right. */
+  .light.left .scrim{
+    background:
+      linear-gradient(96deg,
+        var(--paper) 0%,
+        rgba(242,245,251,.99) 40%,
+        rgba(242,245,251,.975) 53%,
+        rgba(242,245,251,.56) 76%,
+        rgba(242,245,251,.38) 100%);
+  }
+  /* Wider bands with copy across the whole width need an even wash. */
+  .light.full .scrim{background:rgba(242,245,251,.86)}
+
+  /* White copy on the ink ground. */
+  .dark.left .scrim{
+    background:
+      linear-gradient(96deg,
+        rgba(12,21,48,.96) 0%,
+        rgba(12,21,48,.92) 34%,
+        rgba(12,21,48,.80) 56%,
+        rgba(12,21,48,.58) 100%);
+  }
+  .dark.full .scrim{background:rgba(12,21,48,.82)}
+
+  /*
+    Below the hero's two-column breakpoint the copy spans the full width, so
+    a side-weighted gradient would leave text sitting on open photograph.
+    Both variants flatten to an even wash.
+  */
+  @media (max-width:1000px){
+    .light.left .scrim{background:rgba(242,245,251,.96)}
+    .dark.left .scrim{background:rgba(12,21,48,.92)}
+  }
+</style>

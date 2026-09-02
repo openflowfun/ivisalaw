@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import Base from './Base.astro';
 import Guilloche from '../components/Guilloche.astro';
 import FigureMark from '../components/visa/FigureMark.astro';
-import MediaSlot from '../components/MediaSlot.astro';
+import BgMedia from '../components/BgMedia.astro';
 import CtaBand from '../components/home/CtaBand.astro';
 import { SITE } from '../lib/site';
 import { withBuiltFlag } from '../lib/routes';
@@ -85,10 +85,8 @@ const schema = [
 
   <!-- ══ MASTHEAD ══ -->
   <section class="visa-head">
-    <Guilloche />
+    {d.media?.hero ? <BgMedia media={d.media.hero} scrim="light" anchor="left" eager sizes="100vw" /> : <Guilloche />}
     <div class="wrap">
-      <div class="head-grid">
-      <div class="head-copy">
       <nav class="crumb" aria-label="Breadcrumb">
         <a href="/">Home</a><span aria-hidden="true">/</span>
         <a href={sectionHref}>{sectionLabel[d.section]}</a><span aria-hidden="true">/</span>
@@ -100,9 +98,6 @@ const schema = [
         Policy figures checked {d.policyChecked}. These change without notice —
         <a href="https://www.immigration.govt.nz/">verify at immigration.govt.nz</a> before you lodge.
       </p>
-      </div>
-      <MediaSlot media={d.media?.hero} label="Masthead" eager fallback="panel" class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
-      </div>
     </div>
   </section>
 
@@ -142,13 +137,6 @@ const schema = [
       </div>
     </div>
   </section>
-
-  <!-- ══ WIDE BAND SLOT ══ -->
-  <div class="band-media-wrap">
-    <div class="wrap">
-      <MediaSlot media={d.media?.band} label="Section band" fallback="band" ratio={2.8} class="band-media rv" sizes="100vw" />
-    </div>
-  </div>
 
   <!-- ══ ELIGIBILITY ══ -->
   <section id="eligibility" class="alt">
@@ -299,7 +287,7 @@ const schema = [
 
   <!-- ══ WHAT GOES WRONG ══ -->
   <div class="wrong-band">
-    <Guilloche />
+    {d.media?.band ? <BgMedia media={d.media.band} scrim="dark" anchor="full" sizes="100vw" /> : <Guilloche />}
     <div class="wrap">
       <div class="sec-head">
         <h2 class="wipe">What goes wrong</h2>
@@ -409,7 +397,8 @@ const schema = [
 
 <style>
   /* ── masthead ─────────────────────────────────────────── */
-  .visa-head{position:relative;overflow:hidden;padding-block:clamp(2rem,4vw,3.5rem) clamp(2.5rem,5vw,4rem)}
+  .visa-head{position:relative;overflow:hidden;isolation:isolate;padding-block:clamp(2.5rem,5vw,4rem) clamp(4rem,8vw,6rem)}
+  .visa-head .wrap{position:relative;z-index:1}
   .crumb{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;font-size:.84rem;color:var(--ink-3);margin-bottom:1.75rem}
   .crumb a{color:var(--ink-3);text-decoration:none}
   .crumb a:hover{color:var(--indigo);text-decoration:underline}
@@ -458,11 +447,8 @@ const schema = [
   .crit p,.steps p{margin-top:.75rem;color:var(--ink-2);max-width:62ch;font-size:1rem}
 
   /* ── masthead media ───────────────────────────────────── */
-  .head-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(2rem,5vw,4rem);align-items:end}
-  .head-media{align-self:stretch;min-height:100%}
 
   /* ── wide band media ──────────────────────────────────── */
-  .band-media-wrap{padding-block:clamp(2rem,4vw,3rem)}
 
   /* ── process swimlane ─────────────────────────────────────
      Lanes make the point the old numbered list buried: almost
@@ -529,9 +515,9 @@ const schema = [
   .payer.you{color:var(--indigo)}
 
   /* ── what goes wrong ─────────────────────────────────── */
-  .wrong-band{background:var(--ink);color:#fff;position:relative;overflow:hidden;padding-block:clamp(4rem,8vw,7rem)}
+  .wrong-band{background:var(--ink);color:#fff;position:relative;overflow:hidden;isolation:isolate;padding-block:clamp(4rem,8vw,7rem)}
   .wrong-band :global(.guillo){opacity:.055;left:-22%;right:auto;color:#fff;animation-duration:340s;animation-direction:reverse}
-  .wrong-band .wrap{position:relative}
+  .wrong-band .wrap{position:relative;z-index:1}
   .wrong-band .sec-head h2{color:#fff}
   .wrong-band .sec-head p{color:#AEB9D8}
   .wrong-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden}
@@ -540,7 +526,7 @@ const schema = [
   .wrong h3{font-family:var(--serif);font-size:1.32rem;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.25}
   .wrong .cons{margin-top:.85rem;font-size:.94rem;color:#AEB9D8;line-height:1.65}
   .wrong .fix{margin-top:1.15rem;padding-top:1.05rem;border-top:1px solid rgba(255,255,255,.13);font-size:.94rem;color:#fff;line-height:1.65}
-  .wrong .fix span{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--indigo-lite);margin-bottom:.45rem}
+  .wrong .fix span{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--indigo-on-ink);margin-bottom:.45rem}
 
   /* ── faq ──────────────────────────────────────────────── */
   .faq{border-top:1px solid var(--rule)}
@@ -583,7 +569,6 @@ const schema = [
     .svc-grid{grid-template-columns:repeat(2,1fr)}
   }
   @media (max-width:900px){
-    .head-grid{grid-template-columns:1fr}
     /* Swimlane collapses to a single ordered column; the actor label
        stops being implied by position and becomes a visible tag. */
     .swim-heads{display:none}

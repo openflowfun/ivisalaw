@@ -10,12 +10,21 @@
   --ink:#0C1530;          /* deep navy, primary text and dark ground */
   --ink-lift:#141F42;     /* raised surface on the dark ground */
   --ink-2:#3F4C6E;        /* secondary body text */
-  --ink-3:#6B7796;        /* tertiary / meta text */
+  /* Tertiary / meta text. 5.23:1 on paper, 5.71:1 on white. The margin over
+     the 4.5:1 minimum is deliberate: this colour also has to carry small text
+     over background photography, where the scrim leaves it a little less
+     contrast than it gets on flat paper. The v1 value (#6B7796) was 4.09:1
+     and failed AA even before any image was behind it. */
+  --ink-3:#5C6682;
 
   /* brand — sampled from the supplied logo, do not alter */
   --indigo:#3852B3;
   --indigo-lite:#5C77D6;  /* active states, rails */
   --indigo-deep:#22347A;  /* hovers, deep fills */
+  /* Not a spec token. --indigo-lite is defined for active states and rails,
+     and at 4.35:1 on --ink it is too dark for small text. This is the tint to
+     use when indigo has to carry type on the dark ground: 5.2:1, meets AA. */
+  --indigo-on-ink:#6B85E0;
 
   /* paper */
   --paper:#F2F5FB;        /* cool document stock */

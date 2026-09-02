@@ -1,9 +1,22 @@
 ---
-import Guilloche from '../Guilloche.astro';
+import BgMedia from '../BgMedia.astro';
 import TriagePanel from './TriagePanel.astro';
+import type { Media } from '../../content.config';
+
+/*
+  The city sits behind the hero rather than beside it. The guilloche is gone
+  from this section — two competing textures behind the same headline is one
+  too many — but it still runs on the pinned pathway and the CTA band.
+*/
+const bg: Media = {
+  src: 'hero-auckland.jpg',
+  alt: '',
+  ratio: 1.5,
+  duotone: false,
+};
 ---
 <section class="hero">
-  <Guilloche />
+  <BgMedia media={bg} scrim="light" anchor="left" eager sizes="100vw" />
   <div class="wrap">
     <div>
       <span class="kicker rv"><i></i>Licensed by the Immigration Advisers Authority</span>
@@ -23,8 +36,8 @@ import TriagePanel from './TriagePanel.astro';
 </section>
 
 <style>
-  .hero{position:relative;padding:clamp(2.25rem,5vw,4.25rem) 0 clamp(3.5rem,7vw,6rem);overflow:hidden}
-  .hero .wrap{position:relative;display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(2rem,5vw,5rem);align-items:start}
+  .hero{position:relative;padding:clamp(3rem,6vw,5rem) 0 clamp(4rem,8vw,6.5rem);overflow:hidden;isolation:isolate}
+  .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(2rem,5vw,5rem);align-items:start}
   .kicker{display:inline-flex;align-items:center;gap:.6rem;font-size:.85rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.45rem .95rem;border-radius:100px;margin-bottom:2rem}
   .kicker i{width:7px;height:7px;border-radius:50%;background:var(--pounamu);flex-shrink:0;position:relative}
   .kicker i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--pounamu);opacity:.5;animation:pulse 2.8s var(--ease) infinite}
