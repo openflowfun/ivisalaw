@@ -50,7 +50,7 @@ const schema = [{
           <h1 id="h1"><span class="ln"><span>{d.title}</span></span></h1>
           <p class="standfirst rv" data-d="2">{d.intro}</p>
         </div>
-        <MediaSlot label="Section" fallback="quiet" class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
+        <MediaSlot media={d.media} label="Section" fallback="quiet" class="head-media rv" sizes="(max-width:1000px) 100vw, 40vw" />
       </div>
     </div>
   </section>

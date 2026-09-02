@@ -23,6 +23,10 @@ interface Props {
   label: string;
   /** First contentful image on the page should not be lazy. */
   eager?: boolean;
+  /* Widths to generate. Without these, <Picture> emits a single candidate
+     and the `sizes` attribute has nothing to choose between — a 390px phone
+     downloads the same file as a 1440px desktop. */
+  widths?: number[];
   /** Plate to draw when no photograph is set. null collapses the slot. */
   fallback?: 'band' | 'panel' | 'quiet' | null;
   /* Aspect ratio for the slot. A photograph carries its own in frontmatter;
@@ -34,11 +38,25 @@ interface Props {
   sizes?: string;
 }
 
-const { media, label, eager = false, fallback = 'band', ratio: ratioProp, class: extra, sizes = '(max-width: 1000px) 100vw, 50vw' } = Astro.props;
+const {
+  media,
+  label,
+  eager = false,
+  fallback = 'band',
+  ratio: ratioProp,
+  widths = [400, 700, 1100, 1536],
+  class: extra,
+  sizes = '(max-width: 1000px) 100vw, 50vw',
+} = Astro.props;
 
 // Only src/assets/** is processed by Astro's image pipeline.
 const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/**/*.{avif,webp,png,jpg,jpeg}');
 const resolved = media ? images[`/src/assets/${media.src}`] : undefined;
+/*
+  fallbackFormat is JPEG rather than Astro's default PNG: these slots hold
+  photographs with no transparency, and the PNG fallback was emitting 3.4MB
+  per image for browsers that in practice no longer exist.
+*/
 const img = resolved ? (await resolved()).default : undefined;
 const ratio = media?.ratio ?? ratioProp ?? 1.5;
 ---
@@ -51,6 +69,8 @@ const ratio = media?.ratio ?? ratioProp ?? 1.5;
       src={img}
       alt={media.alt}
       formats={['avif', 'webp']}
+      fallbackFormat="jpeg"
+      widths={widths}
       sizes={sizes}
       loading={eager ? 'eager' : 'lazy'}
       decoding={eager ? 'sync' : 'async'}

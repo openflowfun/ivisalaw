@@ -12,6 +12,12 @@ lead: >-
   Start with the route that matches your situation. If none of them fits cleanly, that
   usually means the answer is a sequence rather than a single visa — which is what an
   assessment is for.
+media:
+  src: work-visas.jpg
+  alt: >-
+    People arriving at the entrance of a central Auckland office building on a weekday morning, under a glass canopy and street trees.
+  ratio: 1.5
+  duotone: false
 pathways:
   - title: Accredited Employer Work Visa
     slug: aewv

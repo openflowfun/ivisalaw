@@ -288,6 +288,19 @@ faq:
       An accredited employer with a current Job Check is much faster — two of the three
       approvals already exist.
 
+media:
+  hero:
+    src: aewv.jpg
+    alt: >-
+      A desk in a high-rise Auckland office with documents, a laptop and a coffee cup, looking out over the city to the harbour.
+    ratio: 1.5
+    duotone: false
+  band:
+    src: visa-band.jpg
+    alt: >-
+      A busy Auckland street running toward the Sky Tower, lined with heritage and modern buildings in warm afternoon light.
+    ratio: 2.8
+    duotone: false
 related:
   - title: Employer accreditation
     href: /employers/accreditation/

@@ -293,6 +293,19 @@ faq:
       Your partner and dependent children aged 24 or younger can be included. Everyone aged 16
       and over has English requirements, and everyone needs medicals and police certificates.
 
+media:
+  hero:
+    src: skilled-migrant.jpg
+    alt: >-
+      A bright open-plan workspace in a converted older Auckland building, with a long shared table, tall windows and city views.
+    ratio: 1.5
+    duotone: false
+  band:
+    src: visa-band.jpg
+    alt: >-
+      A busy Auckland street running toward the Sky Tower, lined with heritage and modern buildings in warm afternoon light.
+    ratio: 2.8
+    duotone: false
 related:
   - title: Green List
     href: /residence/green-list/

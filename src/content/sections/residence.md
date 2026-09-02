@@ -11,6 +11,12 @@ intro: >-
 lead: >-
   Three main routes, assessed on different grounds. Choosing the wrong one is one of the more
   expensive mistakes available, because the months spent are not recoverable.
+media:
+  src: residence.jpg
+  alt: >-
+    A tree-lined Auckland street of white weatherboard villas with picket fences, the Sky Tower visible in the distance.
+  ratio: 1.5
+  duotone: false
 pathways:
   - title: Skilled Migrant Category
     slug: skilled-migrant

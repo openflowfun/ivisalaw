@@ -11,6 +11,12 @@ intro: >-
 lead: >-
   We act for employers as well as applicants. Most of the delay in a hire comes from the
   employer side of the process, and most of it is avoidable.
+media:
+  src: employers.jpg
+  alt: >-
+    A warehouse loading bay with a forklift moving a shrink-wrapped pallet, a delivery truck and workers in high-visibility vests.
+  ratio: 1.5
+  duotone: false
 pathways:
   - title: Employer accreditation
     slug: accreditation

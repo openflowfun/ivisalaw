@@ -11,6 +11,12 @@ intro: >-
 lead: >-
   What you can apply for depends on your own status, and — if you are supporting a partner —
   on the skill level of your role rather than your visa type alone.
+media:
+  src: family.jpg
+  alt: >-
+    A sunlit kitchen table in a New Zealand villa, with a child's drawing, a bowl of fruit and a garden beyond the open window.
+  ratio: 1.5
+  duotone: false
 pathways:
   - title: Partner visas
     slug: partner

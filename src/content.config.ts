@@ -188,6 +188,9 @@ const sections = defineCollection({
       href: z.string().optional(),
       tag: z.string().optional(),
     })).min(1),
+    /** Optional masthead image. Falls back to a guilloche plate. */
+    media: media.optional(),
+
     /** Optional orienting questions, rendered as a decision aid. */
     chooser: z.object({
       lead: z.string(),

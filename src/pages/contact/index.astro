@@ -3,10 +3,18 @@ import Base from '../../layouts/Base.astro';
 import Guilloche from '../../components/Guilloche.astro';
 import MediaSlot from '../../components/MediaSlot.astro';
 import { SITE, PENDING } from '../../lib/site';
+import type { Media } from '../../content.config';
 
 /* Office hours are client-supplied (see PENDING in lib/site.ts). The block
    renders only once real hours are set, so nothing false ships. */
 const HOURS = PENDING.officeHours;
+
+const strip: Media = {
+  src: 'contact-strip.jpg',
+  alt: 'A row of heritage and modern building facades on a central Auckland street, with street trees and pedestrians on the footpath.',
+  ratio: 3.2,
+  duotone: false,
+};
 
 const schema = [{
   '@context': 'https://schema.org', '@type': 'LegalService',
@@ -66,7 +74,7 @@ const schema = [{
         </dl>
       )}
 
-      <MediaSlot label="Office exterior" fallback="quiet" ratio={3.2} class="map rv" sizes="100vw" />
+      <MediaSlot media={strip} label="Office exterior" fallback="quiet" ratio={3.2} class="map rv" sizes="100vw" />
 
       <p class="note rv" data-d="4">
         We are licensed immigration advisers, not a law firm. If your matter needs a lawyer

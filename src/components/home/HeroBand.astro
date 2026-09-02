@@ -1,0 +1,43 @@
+---
+import MediaSlot from '../MediaSlot.astro';
+import type { Media } from '../../content.config';
+
+/*
+  Establishing shot, directly under the hero. A city aerial does one job
+  here — it tells you where this firm is before you have read a word — so
+  it sits high, and wide enough to read as a band rather than a picture.
+
+  Contained to the text column rather than full-bleed: the source is 1536px
+  from an image model, which is a soft 1.07x across a full-bleed 1440px
+  viewport but a respectable 1.35x here. Go full-bleed once there is a
+  higher-resolution original.
+
+  The file is referenced before it exists on purpose. MediaSlot resolves
+  src/assets through import.meta.glob, so an absent file simply falls back
+  to the guilloche plate — drop the image in at the path below and the
+  photograph replaces it with no other change.
+*/
+const hero: Media = {
+  src: 'hero-auckland.jpg',
+  alt: 'Central Auckland from the air, the Sky Tower rising above the CBD with the Waitematā Harbour and Harbour Bridge beyond.',
+  ratio: 2.4,
+  duotone: false,
+};
+---
+<div class="hero-band">
+  <div class="wrap">
+    <MediaSlot
+      media={hero}
+      label="Homepage hero"
+      eager
+      fallback="band"
+      ratio={2.4}
+      class="rv"
+      sizes="(max-width:1000px) 100vw, 1136px"
+    />
+  </div>
+</div>
+
+<style>
+  .hero-band{padding-bottom:clamp(2rem,4vw,3rem)}
+</style>

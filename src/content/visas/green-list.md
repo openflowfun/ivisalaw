@@ -272,6 +272,19 @@ faq:
       Migrant points sooner than 24 months, that route may finish first. Worth comparing rather
       than assuming.
 
+media:
+  hero:
+    src: green-list.jpg
+    alt: >-
+      A multi-storey building under construction in Auckland, with scaffolding, a tower crane and workers in high-visibility gear.
+    ratio: 1.5
+    duotone: false
+  band:
+    src: visa-band.jpg
+    alt: >-
+      A busy Auckland street running toward the Sky Tower, lined with heritage and modern buildings in warm afternoon light.
+    ratio: 2.8
+    duotone: false
 related:
   - title: Skilled Migrant residence
     href: /residence/skilled-migrant/
