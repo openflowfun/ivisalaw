@@ -38,12 +38,17 @@ const stages = [
       <div class="wrap">
         <div class="rail" id="rail">
           {stages.map((s, i) => (
-            <button class:list={['rail-item', i === 0 && 'on']} data-i={String(i)}>{s.title}</button>
+            <button
+              class:list={['rail-item', i === 0 && 'on']}
+              data-i={String(i)}
+              id={`rail-${i}`}
+              aria-controls={`pane-${i}`}
+            >{s.title}</button>
           ))}
         </div>
         <div class="stage-panes" id="panes">
           {stages.map((s, i) => (
-            <div class:list={['pane', i === 0 && 'on']}>
+            <div class:list={['pane', i === 0 && 'on']} id={`pane-${i}`} aria-labelledby={`rail-${i}`}>
               <div class="num">{s.n}</div>
               <h3>{s.title}</h3>
               <p>{s.body}</p>

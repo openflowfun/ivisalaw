@@ -12,7 +12,7 @@
     "check:content": "sh scripts/check-frontmatter.sh",
     "build:preview": "npm run check:content && astro check && PUBLIC_PREVIEW=true astro build",
     "deploy:preview": "npm run build:preview && npx wrangler pages deploy dist --project-name=ivisalaw-preview --commit-dirty=true",
-    "build:pages": "npm run build:preview && node scripts/rebase-for-pages.mjs /ivisalaw"
+    "build:pages": "npm run build:preview && PREVIEW_ORIGIN=https://openflowfun.github.io node scripts/rebase-for-pages.mjs /ivisalaw"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

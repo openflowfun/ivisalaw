@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="iVISALAW">
+  <rect width="64" height="64" rx="12" fill="#3852B3"/>
+  <!-- lowercase i, skewed to echo the italic serif of the wordmark -->
+  <g fill="#F2F5FB" transform="skewX(-9) translate(5 0)">
+    <circle cx="32" cy="17.5" r="4.6"/>
+    <path d="M28.4 26.5h7.2v22.2h-7.2z" rx="1"/>
+  </g>
+</svg>

@@ -24,7 +24,11 @@ if (!base.startsWith('/')) {
 }
 
 const DIST = 'dist';
-const REWRITABLE = new Set(['.html', '.xml', '.txt']);
+/* Origin the preview is actually served from, for absolute social URLs. */
+const PREVIEW_ORIGIN = process.env.PREVIEW_ORIGIN || '';
+/* .webmanifest matters: its icon paths are root-absolute too, and a manifest
+   whose icons 404 is exactly the kind of thing nobody notices. */
+const REWRITABLE = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json']);
 
 function walk(dir) {
   return readdirSync(dir).flatMap(name => {
@@ -72,6 +76,32 @@ for (const file of walk(DIST)) {
     });
     return `${attr}="${rewritten}"`;
   });
+
+  /*
+    og:image and twitter:image are absolute URLs to the production domain,
+    which does not serve this build yet — so a preview link shared to
+    WhatsApp would render the blank card this work was meant to fix. Point
+    them at the preview origin instead. Only the preview build is touched;
+    the production build keeps the real domain.
+  */
+  /*
+    The web manifest is JSON, so its paths are `"src": "/icon-192.png"` and the
+    attribute regex above never sees them. Rewriting the keys that hold a path
+    keeps the installed-icon set from 404ing.
+  */
+  if (extname(file) === '.webmanifest' || extname(file) === '.json') {
+    after = after.replace(
+      new RegExp(`("(?:src|start_url|scope)"\\s*:\\s*")/(?!${slug}/)`, 'g'),
+      (_m, lead) => { edits++; return `${lead}${base}/`; },
+    );
+  }
+
+  if (PREVIEW_ORIGIN) {
+    after = after.replace(
+      /(<meta (?:property|name)="(?:og:image|twitter:image)" content=")https?:\/\/[^/"]+/g,
+      `$1${PREVIEW_ORIGIN}${base}`,
+    );
+  }
 
   if (after !== before) {
     writeFileSync(file, after);

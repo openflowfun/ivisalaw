@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import Guilloche from '../components/Guilloche.astro';
+import { SITE } from '../lib/site';
+
+/*
+  A 404 on an immigration site usually means someone followed an old Wix link
+  or a stale search result. Sending them to the homepage makes them start over,
+  so this offers the four section indexes instead — the reader almost always
+  knows which of these they were after.
+
+  Step 9 adds 301s from every old Wix URL. This is the net beneath those.
+*/
+const routes = [
+  { href: '/work-visas/', label: 'Work visas', note: 'AEWV, post-study and employer-assisted routes.' },
+  { href: '/residence/', label: 'Residence', note: 'Skilled Migrant, Green List and partnership.' },
+  { href: '/family/', label: 'Partner and family', note: 'Partner visas and dependent children.' },
+  { href: '/employers/', label: 'For employers', note: 'Accreditation, Job Check and audits.' },
+];
+---
+<Base
+  title="Page not found | iVISALAW"
+  description="That page could not be found. Browse work visas, residence, family and employer pathways, or contact our Auckland office."
+>
+  <section class="nf">
+    <Guilloche />
+    <div class="wrap">
+      <p class="code">404</p>
+      <h1 id="h1"><span class="ln"><span>That page has moved, or never existed</span></span></h1>
+      <p class="standfirst rv" data-d="2">
+        If you followed a link from an old version of this site or a search result, the page may
+        have been renamed. Start from one of these instead.
+      </p>
+
+      <div class="routes rv glow-grid" data-d="2">
+        {routes.map(r => (
+          <a class="route glow" href={r.href}>
+            <h2>{r.label}</h2>
+            <p>{r.note}</p>
+          </a>
+        ))}
+      </div>
+
+      <p class="help rv" data-d="3">
+        Still stuck? Call <a href={SITE.phoneHref}>{SITE.phone}</a> or
+        <a href={`mailto:${SITE.email}`}>email us</a> and we will point you at the right page.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf{position:relative;overflow:hidden;isolation:isolate;padding-block:clamp(3rem,7vw,6rem) clamp(4rem,8vw,7rem)}
+  .nf .wrap{position:relative;z-index:1}
+  .code{font-family:var(--serif);font-size:clamp(3rem,7vw,5rem);font-weight:350;color:var(--indigo);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  h1{margin-top:.6rem;font-family:var(--serif);font-size:clamp(2.1rem,4.6vw,3.4rem);letter-spacing:-.03em;line-height:1.06;font-weight:350;max-width:18ch}
+  h1 .ln{display:block;overflow:hidden}
+  h1 .ln>span{display:block;transform:translateY(105%);transition:transform 1.25s var(--ease)}
+  h1.in .ln>span{transform:none}
+  .standfirst{margin-top:1.5rem;font-size:1.1rem;color:var(--ink-2);max-width:54ch}
+
+  .routes{margin-top:clamp(2.5rem,5vw,3.5rem);display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .route{background:var(--paper);padding:1.6rem 1.5rem;text-decoration:none;color:inherit;position:relative;transition:background .5s var(--ease)}
+  .route:hover{background:var(--white)}
+  .route h2{font-family:var(--serif);font-size:1.3rem;font-weight:400;letter-spacing:-.02em}
+  .route p{margin-top:.5rem;font-size:.92rem;color:var(--ink-2);line-height:1.6}
+
+  .help{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--rule);font-size:.98rem;color:var(--ink-2)}
+
+  @media (max-width:640px){ .routes{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ h1 .ln>span{transform:none!important} }
+</style>

@@ -122,8 +122,66 @@ let cur = 0;
 function setStage(i: number) {
   if (i === cur) return;
   cur = i;
-  panes.forEach((p, n) => p.classList.toggle('on', n === i));
-  rails.forEach((r, n) => r.classList.toggle('on', n === i));
+  panes.forEach((p, n) => {
+    p.classList.toggle('on', n === i);
+    if (p.getAttribute('role') === 'tabpanel') {
+      if (n === i) p.removeAttribute('aria-hidden');
+      else p.setAttribute('aria-hidden', 'true');
+    }
+  });
+  rails.forEach((r, n) => {
+    r.classList.toggle('on', n === i);
+    if (r.getAttribute('role') === 'tab') {
+      r.setAttribute('aria-selected', String(n === i));
+      // Only the selected tab stays in the tab order; arrow keys move between.
+      r.tabIndex = n === i ? 0 : -1;
+    }
+  });
+}
+
+/*
+  Tab semantics, applied only while the rail is actually behaving like tabs.
+
+  Below 1000px, and under reduced motion, the rail is hidden and every pane
+  is shown at once as a plain sequence. Announcing a tablist there would
+  describe an interaction that no longer exists, so the roles are added and
+  removed with the behaviour rather than baked into the markup.
+*/
+function syncRailSemantics() {
+  if (!rail || !rails.length) return;
+  const active = window.innerWidth > 1000 && !prefersReduced();
+
+  if (active) {
+    rail.setAttribute('role', 'tablist');
+    rail.setAttribute('aria-label', 'Residence pathway stages');
+    rail.setAttribute('aria-orientation', 'vertical');
+    rails.forEach((r, n) => {
+      r.setAttribute('role', 'tab');
+      r.setAttribute('aria-selected', String(n === cur));
+      r.tabIndex = n === cur ? 0 : -1;
+    });
+    panes.forEach((p, n) => {
+      p.setAttribute('role', 'tabpanel');
+      p.tabIndex = 0;
+      // A pane that is not on screen should not be reachable or read out.
+      if (n === cur) p.removeAttribute('aria-hidden');
+      else p.setAttribute('aria-hidden', 'true');
+    });
+  } else {
+    rail.removeAttribute('role');
+    rail.removeAttribute('aria-label');
+    rail.removeAttribute('aria-orientation');
+    rails.forEach(r => {
+      r.removeAttribute('role');
+      r.removeAttribute('aria-selected');
+      r.removeAttribute('tabindex');
+    });
+    panes.forEach(p => {
+      p.removeAttribute('role');
+      p.removeAttribute('tabindex');
+      p.removeAttribute('aria-hidden');
+    });
+  }
 }
 
 function onScroll() {
@@ -153,26 +211,16 @@ function requestScroll() {
   }
 }
 
-/* Number count-up on the rules strip. */
-function count(el: HTMLElement) {
-  if (prefersReduced()) return;
-  const target = parseFloat(el.dataset.count || '0');
-  const dec = parseInt(el.dataset.dec || '0', 10);
-  const pre = el.dataset.pre || '';
-  const post = el.dataset.post || '';
-  const dur = 1100;
-  let t0: number | null = null;
+/*
+  The rules strip used to count its figures up from zero. It looked good and
+  it was wrong: for the first second of the animation the page displayed
+  "$11.09" as the immigration median wage — below the adult minimum wage, and
+  on a page whose entire argument is that these are the exact current numbers.
 
-  function step(ts: number) {
-    if (t0 === null) t0 = ts;
-    const p = Math.min((ts - t0) / dur, 1);
-    const e = 1 - Math.pow(1 - p, 4);
-    el.textContent = pre + (target * e).toFixed(dec) + post;
-    if (p < 1) requestAnimationFrame(step);
-  }
-  el.textContent = pre + (0).toFixed(dec) + post;
-  requestAnimationFrame(step);
-}
+  The true value now lives in the DOM from first paint and never changes. The
+  reveal is the .rv opacity/translate the rest of the site already uses, so a
+  figure fades in rather than lying on the way up.
+*/
 
 /*
   Edge-light: writes the pointer position onto whichever card is under the
@@ -285,14 +333,13 @@ function initPage() {
         if (!e.isIntersecting) return;
         const t = e.target as HTMLElement;
         t.classList.add('in');
-        if (t.hasAttribute('data-count')) count(t);
         io?.unobserve(t);
       });
     },
     { threshold: 0.18, rootMargin: '0px 0px -8% 0px' },
   );
   document
-    .querySelectorAll('.rv,.wipe,.drawline,[data-count]')
+    .querySelectorAll('.rv,.wipe,.drawline')
     .forEach(el => io?.observe(el));
 
   /* scroll chrome */
@@ -307,6 +354,27 @@ function initPage() {
   on(window, 'scroll', requestScroll, { passive: true });
   on(window, 'resize', requestScroll, { passive: true });
   onScroll();
+
+  syncRailSemantics();
+  on(window, 'resize', syncRailSemantics, { passive: true });
+
+  /* Arrow keys move between tabs, as the tab pattern requires. */
+  rails.forEach((r, n) => {
+    on(r, 'keydown', e => {
+      const ev = e as KeyboardEvent;
+      if (r.getAttribute('role') !== 'tab') return;
+      const last = rails.length - 1;
+      let next: number | null = null;
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowRight') next = n === last ? 0 : n + 1;
+      if (ev.key === 'ArrowUp' || ev.key === 'ArrowLeft') next = n === 0 ? last : n - 1;
+      if (ev.key === 'Home') next = 0;
+      if (ev.key === 'End') next = last;
+      if (next === null) return;
+      ev.preventDefault();
+      rails[next].focus();
+      rails[next].click();
+    });
+  });
 
   /* rail is clickable too */
   rails.forEach(r => {

@@ -1,6 +1,47 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════
+   0. FONTS — self-hosted
+   Google Fonts cost two DNS lookups and two TLS handshakes before the
+   first byte of a font arrived, on the critical path for text that is
+   the whole design. Served from our own origin these are one connection
+   we have already made.
+
+   Latin subsets only, and variable rather than a face per weight: the
+   design uses Newsreader 300–400 and Public Sans 300–700, which is eight
+   static files replaced by two variable ones.
+
+   font-display:swap means text paints immediately in the fallback and
+   reflows once the face lands — a flash of the wrong font beats a blank
+   headline.
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face{
+  font-family:"Newsreader";
+  src:url("/fonts/newsreader-latin.woff2") format("woff2");
+  font-weight:200 700;
+  font-style:normal;
+  font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:"Newsreader";
+  src:url("/fonts/newsreader-italic-latin.woff2") format("woff2");
+  font-weight:300 600;
+  font-style:italic;
+  font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:"Public Sans";
+  src:url("/fonts/public-sans-latin.woff2") format("woff2");
+  font-weight:300 700;
+  font-style:normal;
+  font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
    1. DESIGN TOKENS — build spec §4
    Canonical names live here as plain custom properties. The @theme
    block below exposes them to Tailwind; it does not redefine them.
@@ -246,6 +287,8 @@ footer{background:var(--paper);border-top:1px solid var(--rule);padding-block:cl
   .foot-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:640px){
+  /* Room for the fixed Call / Book bar, so it never covers the footer. */
+  body{padding-bottom:calc(4.9rem + env(safe-area-inset-bottom,0px))}
   .nav{display:none}
   .nav.open{display:flex;position:absolute;top:100%;left:0;right:0;background:var(--white);flex-direction:column;align-items:stretch;gap:0;padding:.5rem var(--pad) 1.35rem;border-bottom:1px solid var(--rule);box-shadow:0 20px 40px -24px rgba(12,21,48,.4)}
   .nav.open a{padding:.9rem 0;border-bottom:1px solid var(--rule)}

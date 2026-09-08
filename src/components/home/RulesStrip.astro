@@ -1,8 +1,8 @@
 ---
 /*
   The four figures every application is measured against. Values are
-  duplicated as text content and data-count so the numbers are correct
-  with JS off and animate up when it's on.
+  rendered as text and never touched by script, so the figure a reader sees
+  is always the real one.
 
   CLIENT VERIFICATION: every figure here needs sign-off before launch.
   See src/content/visas/ figures[] for the same discipline on visa pages.
@@ -10,16 +10,16 @@
 const stamp = '1 September 2026';
 
 const figures = [
-  { value: '$35.00', count: '35', pre: '$', dec: '2',
+  { value: '$35.00',
     label: 'Immigration median wage',
     sub: 'From 9 March 2026. Sets Green List pay floors, partner support and Skilled Migrant thresholds.' },
-  { value: '$23.95', count: '23.95', pre: '$', dec: '2',
+  { value: '$23.95',
     label: 'Adult minimum wage',
     sub: 'From 1 April 2026. AEWV pay must meet this and the market rate for the role.' },
-  { value: '6', count: '6', dec: '0',
+  { value: '6',
     label: 'Points to apply under SMC',
     sub: 'From occupational registration, an NZQF qualification, or income, topped up with NZ work experience.' },
-  { value: '5 yrs', count: '5', post: ' yrs', dec: '0',
+  { value: '5 yrs',
     label: 'Maximum AEWV stay',
     sub: 'For skilled roles. Shorter durations apply lower down the National Occupation List.' },
 ];
@@ -34,7 +34,7 @@ const figures = [
       {figures.map((f, i) => (
         <div class="rule-cell rv" data-d={String(i + 1)}>
           <div class="bar drawline" data-d={i > 0 ? String(i) : undefined}></div>
-          <div class="fig" data-count={f.count} data-pre={f.pre} data-post={f.post} data-dec={f.dec}>{f.value}</div>
+          <div class="fig">{f.value}</div>
           <div class="lbl">{f.label}</div>
           <div class="sub">{f.sub}</div>
         </div>

@@ -1,0 +1,14 @@
+{
+  "name": "iVISALAW NZ",
+  "short_name": "iVISALAW",
+  "description": "Licensed immigration advisers in central Auckland.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#F2F5FB",
+  "theme_color": "#3852B3",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
