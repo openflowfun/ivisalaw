@@ -49,7 +49,7 @@ const stages = [
         <div class="stage-panes" id="panes">
           {stages.map((s, i) => (
             <div class:list={['pane', i === 0 && 'on']} id={`pane-${i}`} aria-labelledby={`rail-${i}`}>
-              <div class="num">{s.n}</div>
+              <div class="num" aria-hidden="true">{s.n}</div>
               <h3>{s.title}</h3>
               <p>{s.body}</p>
               <span class="dur">{s.dur}</span>
@@ -81,7 +81,7 @@ const stages = [
   .stage-panes{position:relative;min-height:340px}
   .pane{position:absolute;inset:0;opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .75s var(--ease);pointer-events:none}
   .pane.on{opacity:1;transform:none;pointer-events:auto}
-  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;color:rgba(255,255,255,.15);font-weight:300;letter-spacing:-.05em}
+  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;color:rgba(255,255,255,.38);font-weight:300;letter-spacing:-.05em}
   .pane h3{font-family:var(--serif);font-size:clamp(2rem,4.2vw,3.1rem);margin-top:-.16em;font-weight:350;letter-spacing:-.03em;color:#fff}
   .pane p{margin-top:1.3rem;color:#AEB9D8;font-size:1.08rem;max-width:48ch}
   .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px}

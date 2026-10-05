@@ -311,13 +311,16 @@ section{padding-block:clamp(4rem,8vw,7.5rem)}
    ═══════════════════════════════════════════════════════════════════ */
 footer{background:var(--paper);border-top:1px solid var(--rule);padding-block:clamp(3rem,6vw,4.5rem) 2rem;font-size:.92rem}
 .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.2fr;gap:2.5rem}
-.foot-grid h4{font-size:.83rem;font-weight:700;margin-bottom:1rem}
+/* h2, not h4: after a page whose last heading is an h2, an h4 skips a level
+   and breaks the outline screen-reader users navigate by. Styled small. */
+.foot-grid h2{font-family:var(--sans);font-size:.83rem;font-weight:700;letter-spacing:0;line-height:1.3;margin-bottom:1rem}
 .foot-grid ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.6rem}
 .foot-grid a{color:var(--ink-2);text-decoration:none}
 .foot-grid a:hover{color:var(--indigo);text-decoration:underline}
 /* Declared in the nav but not yet written — shown, never linked. */
-.foot-grid .soon,.foot-bottom .soon{color:var(--ink-3);opacity:.7}
-.foot-grid .soon::after,.foot-bottom .soon::after{content:" · in preparation";font-size:.85em;opacity:.75}
+/* Muted by colour alone: --ink-3 is 5.23:1 on paper. Opacity here measured 2.88:1. */
+.foot-grid .soon,.foot-bottom .soon{color:var(--ink-3)}
+.foot-grid .soon::after,.foot-bottom .soon::after{content:" · in preparation";font-size:.85em}
 .foot-brand p{color:var(--ink-2);margin-top:1.1rem;max-width:34ch;font-size:.9rem}
 .iaa{margin-top:1.5rem;display:inline-flex;align-items:center;gap:.35rem;flex-wrap:wrap;line-height:1.4;max-width:100%;font-size:.82rem;color:var(--ink-2);border:1px solid var(--rule);background:var(--white);padding:.6rem .9rem;border-radius:4px;text-decoration:none}
 .iaa strong{color:var(--ink)}

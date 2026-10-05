@@ -33,13 +33,13 @@ const year = new Date().getFullYear();
         <p>{SITE.legalName}, trading as {SITE.name}.</p>
         <a class="iaa" href={SITE.iaaRegister}>Licensed by the <strong>Immigration Advisers Authority</strong></a>
       </div>
-      <div><h4>Visas</h4><ul>
+      <div><h2>Visas</h2><ul>
         {visaLinks.map(l => <li>{l.ready ? <a href={l.href}>{l.label}</a> : <span class="soon">{l.label}</span>}</li>)}
       </ul></div>
-      <div><h4>Employers</h4><ul>
+      <div><h2>Employers</h2><ul>
         {employerLinks.map(l => <li>{l.ready ? <a href={l.href}>{l.label}</a> : <span class="soon">{l.label}</span>}</li>)}
       </ul></div>
-      <div><h4>Contact</h4><ul>
+      <div><h2>Contact</h2><ul>
         <li><a href={SITE.phoneHref}>{SITE.phone}</a></li>
         <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
         <li>{SITE.address.street}<br />{SITE.address.street2}<br />{SITE.address.locality} {SITE.address.postcode}</li>

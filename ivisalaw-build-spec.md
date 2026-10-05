@@ -183,14 +183,20 @@ Redirects matter more than they look — every `/copy-of-workvisa` style URL nee
 ## 6. Open items for the client
 
 - [x] ~~IAA licence numbers for the five advisers~~ — **this item was wrong.** The firm has
-  **two** licensed advisers, not six: Bob Fenwick (200800177) and Sakina Silva (202300655).
-  Source: the firm's own video, corroborated by an independent directory listing. The first
-  draft showed three unlicensed staff as "Licensed Immigration Adviser" and the hero said
-  "Six licensed advisers" — holding someone out as licensed when they are not is an offence
-  under the Immigration Advisers Licensing Act 2007. Corrected 5 Oct 2026. **Never add a
-  licence claim without a licence number the client has confirmed.**
+  **three** licensed advisers, not six: Bob Fenwick (200800177), Sakina Silva (202300655) and
+  Jessica Kim (202603871, provisional). Bob and Sakina are from the firm's own video,
+  corroborated by an independent directory listing; Jessica's provisional licence is from the
+  firm's current About page (the video predates it). The first draft showed three unlicensed
+  staff as "Licensed Immigration Adviser" and the hero said "Six licensed advisers" — holding
+  someone out as licensed when they are not is an offence under the Immigration Advisers
+  Licensing Act 2007. Corrected 5 Oct 2026. **Never add a licence claim without a licence
+  number the client has confirmed.**
 - [ ] Client to confirm the corrected roles: Kanchana Kulasinghe (Director), Imaya Munasinghe
-  (Office Manager), Jessica Kim (Immigration Assistant), Julianne Lee (Student Consultant)
+  (Office Manager), Jessica Kim (Licensed Immigration Adviser, provisional), Julianne Lee
+  (Student Consultant)
+- [ ] **Free or paid first assessment?** The old site offers a "free initial assessment"; the
+  new site's copy (carried from v1) is built around a paid assessment. Whichever is true, every
+  page has to say the same thing — the client decides, then the copy follows.
 - [ ] Confirm Sakina's licence is current — the certificate in the video shows an expiry of
   16 August 2026, which has passed. The register is the source of truth.
 - [ ] **Errors in the firm's video, now playing in the homepage hero:** the name banner reads

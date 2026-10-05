@@ -550,7 +550,10 @@ const schema = [
   a.svc:hover{background:var(--white)}
   a.svc:hover::before{transform:scaleX(1)}
   .svc.via .go em{display:block;margin-top:.2rem;font-style:normal;font-weight:400;font-size:.8rem;color:var(--ink-3)}
-  .svc.soon{opacity:.62}
+  /* "Not yet written" is said by the hatched fill, the missing hover and the
+     label — never by fading the card. Opacity drags every colour inside it
+     below AA (it measured 2.6-3.2:1); these colours all clear 4.5:1 on paper. */
+  .svc.soon{background:transparent;box-shadow:inset 0 0 0 1px var(--rule);background-image:repeating-linear-gradient(135deg,transparent 0 10px,rgba(210,218,234,.28) 10px 11px)}
   .svc.soon h3{color:var(--ink-2)}
   .svc.soon .go{color:var(--ink-3);font-weight:500}
   .svc h3{font-family:var(--serif);font-size:1.3rem;font-weight:400}
