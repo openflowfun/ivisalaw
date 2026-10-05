@@ -276,20 +276,26 @@ html.js-lenis,html.js-lenis body{height:auto}
 }
 /* Copy across the whole width needs an even wash. */
 .bg-scrim.light.full{background:rgba(242,245,251,.86)}
-/* White copy on the ink ground. */
+/* White copy over a film or photo that should actually be seen. A dark tint,
+   not a white wash: darkening keeps footage's colour and contrast where a
+   white wash flattens it to milk. The copy column still needs ~74% because
+   the hardest frames are white (the team cards sit behind the headline);
+   beyond the column it falls to 14%, so the right of the frame plays almost
+   untouched. Tuned against every frame of the hero film — see the commit. */
 .bg-scrim.dark.left{
   background:linear-gradient(96deg,
-    rgba(12,21,48,.96) 0%,
-    rgba(12,21,48,.92) 34%,
-    rgba(12,21,48,.80) 56%,
-    rgba(12,21,48,.58) 100%);
+    rgba(12,21,48,.80) 0%,
+    rgba(12,21,48,.74) 48%,
+    rgba(12,21,48,.50) 60%,
+    rgba(12,21,48,.26) 78%,
+    rgba(12,21,48,.14) 100%);
 }
 .bg-scrim.dark.full{background:rgba(12,21,48,.82)}
 /* Below the hero's two-column breakpoint the copy spans the full width, so a
    side-weighted gradient would leave text on open imagery. Flatten. */
 @media (max-width:1000px){
   .bg-scrim.light.left{background:rgba(242,245,251,.96)}
-  .bg-scrim.dark.left{background:rgba(12,21,48,.92)}
+  .bg-scrim.dark.left{background:rgba(12,21,48,.80)}
 }
 
 /* ═══════════════════════════════════════════════════════════════════

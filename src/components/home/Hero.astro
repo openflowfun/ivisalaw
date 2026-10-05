@@ -9,11 +9,11 @@ import TriagePanel from './TriagePanel.astro';
   headline is one too many — but still runs on the pinned pathway and CTA.
 */
 ---
-<section class="hero">
+<section class="hero on-film">
   <BgVideo
     src="/video/ivisalaw-hero.mp4"
     poster="/video/ivisalaw-hero-poster.jpg"
-    scrim="light"
+    scrim="dark"
     anchor="left"
     label="iVISALAW film"
   />
@@ -50,6 +50,15 @@ import TriagePanel from './TriagePanel.astro';
   h1 .ln:nth-child(3)>span{transition-delay:.2s}
   .hero-body{margin-top:2rem;font-size:1.16rem;color:var(--ink-2);max-width:50ch}
   .hero-meta{margin-top:2.6rem;padding-top:1.5rem;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:.6rem 2.2rem;font-size:.89rem;color:var(--ink-3)}
+
+  /*
+    Over the film the hero inverts: white type on a dark tint, so the footage
+    can be seen rather than washed out behind the copy. Kept as a modifier so
+    the light treatment still exists if the hero ever goes back to a still.
+  */
+  .on-film h1{color:#fff}
+  .on-film .hero-body{color:#E8ECF6}
+  .on-film .hero-meta{color:#CBD3EA;border-top-color:rgba(255,255,255,.22)}
 
   @media (max-width:1000px){
     .hero .wrap{grid-template-columns:1fr}
