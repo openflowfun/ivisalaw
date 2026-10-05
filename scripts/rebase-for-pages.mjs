@@ -44,7 +44,9 @@ function walk(dir) {
   run from double-prefixing.
 */
 const slug = base.slice(1);
-const attrPattern = new RegExp(`(href|src)="/(?!${slug}/)`, 'g');
+/* poster is on the list for the hero video: a <video poster> left at the
+   root would 404 on the preview and leave a blank box until playback. */
+const attrPattern = new RegExp(`(href|src|poster)="/(?!${slug}/)`, 'g');
 
 /*
   srcset needs separate handling: it holds a comma-separated list of
@@ -120,6 +122,13 @@ for (const file of walk(DIST)) {
   const html = readFileSync(file, 'utf8');
   for (const m of html.matchAll(/["'\s]\/_astro\/[^"'\s,]+/g)) {
     leaks.push(`${file}: ${m[0].trim()}`);
+  }
+  /* Any root-absolute href/src/poster left behind would 404 too. The /_astro/
+     check above predates the video, and would not have caught /video/ or
+     /fonts/ — so look at the attributes themselves. Protocol-relative URLs
+     ("//") are external and fine. */
+  for (const m of html.matchAll(new RegExp(`\\b(href|src|poster)="/(?!/)(?!${slug}/)[^"]*"`, 'g'))) {
+    leaks.push(`${file}: ${m[0]}`);
   }
 }
 if (leaks.length) {

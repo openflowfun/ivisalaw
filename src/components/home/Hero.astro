@@ -1,22 +1,22 @@
 ---
-import BgMedia from '../BgMedia.astro';
+import BgVideo from '../BgVideo.astro';
 import TriagePanel from './TriagePanel.astro';
-import type { Media } from '../../content.config';
 
 /*
-  The city sits behind the hero rather than beside it. The guilloche is gone
-  from this section — two competing textures behind the same headline is one
-  too many — but it still runs on the pinned pathway and the CTA band.
+  The firm's own film sits behind the hero: real office, real team, real
+  licences, which does more for a trust-based practice than any skyline.
+  The guilloche stays off this section — two competing textures behind one
+  headline is one too many — but still runs on the pinned pathway and CTA.
 */
-const bg: Media = {
-  src: 'hero-auckland.jpg',
-  alt: '',
-  ratio: 1.5,
-  duotone: false,
-};
 ---
 <section class="hero">
-  <BgMedia media={bg} scrim="light" anchor="left" eager sizes="100vw" />
+  <BgVideo
+    src="/video/ivisalaw-hero.mp4"
+    poster="/video/ivisalaw-hero-poster.jpg"
+    scrim="light"
+    anchor="left"
+    label="iVISALAW film"
+  />
   <div class="wrap">
     <div>
       <span class="kicker rv"><i></i>Licensed by the Immigration Advisers Authority</span>
@@ -28,7 +28,7 @@ const bg: Media = {
       <p class="hero-body rv" data-d="3">Immigration New Zealand changed the rules four times in the last eighteen months. We read every one of them, so you never have to guess whether your case is worth filing.</p>
       <div class="hero-meta rv" data-d="4">
         <span>Central Auckland since 2008</span>
-        <span>Six licensed advisers</span>
+        <span>Two licensed advisers</span>
       </div>
     </div>
     <TriagePanel />

@@ -182,8 +182,24 @@ Redirects matter more than they look — every `/copy-of-workvisa` style URL nee
 
 ## 6. Open items for the client
 
-- [ ] IAA licence numbers for the five advisers still showing as placeholder
-- [ ] Confirm who is a licensed adviser vs. case manager — currently guessed
+- [x] ~~IAA licence numbers for the five advisers~~ — **this item was wrong.** The firm has
+  **two** licensed advisers, not six: Bob Fenwick (200800177) and Sakina Silva (202300655).
+  Source: the firm's own video, corroborated by an independent directory listing. The first
+  draft showed three unlicensed staff as "Licensed Immigration Adviser" and the hero said
+  "Six licensed advisers" — holding someone out as licensed when they are not is an offence
+  under the Immigration Advisers Licensing Act 2007. Corrected 5 Oct 2026. **Never add a
+  licence claim without a licence number the client has confirmed.**
+- [ ] Client to confirm the corrected roles: Kanchana Kulasinghe (Director), Imaya Munasinghe
+  (Office Manager), Jessica Kim (Immigration Assistant), Julianne Lee (Student Consultant)
+- [ ] Confirm Sakina's licence is current — the certificate in the video shows an expiry of
+  16 August 2026, which has passed. The register is the source of truth.
+- [ ] **Errors in the firm's video, now playing in the homepage hero:** the name banner reads
+  "BOB FENWICK — LIA 200800117" but his certificate and the register say **200800177**; the
+  banner also spells it "Licenced" (NZ English: "Licensed"). Fix before launch, or trim the
+  video so those frames do not play on a site whose argument is "verify us".
+- [ ] "Central Auckland since 2008" vs the video's "founded in 1999" — which is right, and are
+  both true (founded 1999, central Auckland from 2008)?
+- [ ] Does the video carry a voiceover? If so it needs captions once sound is on (WCAG 1.2.2).
 - [ ] Sign-off on every policy figure and threshold before launch
 - [ ] Is "iVISALAW" staying? A firm of licensed advisers trading under "law" is worth a compliance check
 - [ ] Photography: commission a shoot, or generate and duotone?

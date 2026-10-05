@@ -256,6 +256,43 @@ html.js-lenis,html.js-lenis body{height:auto}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   6c. BACKGROUND SCRIMS — shared by BgMedia (photos) and BgVideo
+   The gradient values here were tuned by measuring the composited contrast
+   of the real text against the real imagery, to clear WCAG AA. They live in
+   one place because a photo background and a video background behind the
+   same headline must protect it identically — two copies would drift.
+   Usage: <span class="bg-scrim light left">. Host needs position:relative.
+   ═══════════════════════════════════════════════════════════════════ */
+.bg-scrim{position:absolute;inset:0;pointer-events:none}
+/* Dark copy on paper. Near-solid across the copy column (~53% of the hero),
+   opening up beyond it so the image reads in the open space. */
+.bg-scrim.light.left{
+  background:linear-gradient(96deg,
+    var(--paper) 0%,
+    rgba(242,245,251,.99) 40%,
+    rgba(242,245,251,.975) 53%,
+    rgba(242,245,251,.56) 76%,
+    rgba(242,245,251,.38) 100%);
+}
+/* Copy across the whole width needs an even wash. */
+.bg-scrim.light.full{background:rgba(242,245,251,.86)}
+/* White copy on the ink ground. */
+.bg-scrim.dark.left{
+  background:linear-gradient(96deg,
+    rgba(12,21,48,.96) 0%,
+    rgba(12,21,48,.92) 34%,
+    rgba(12,21,48,.80) 56%,
+    rgba(12,21,48,.58) 100%);
+}
+.bg-scrim.dark.full{background:rgba(12,21,48,.82)}
+/* Below the hero's two-column breakpoint the copy spans the full width, so a
+   side-weighted gradient would leave text on open imagery. Flatten. */
+@media (max-width:1000px){
+  .bg-scrim.light.left{background:rgba(242,245,251,.96)}
+  .bg-scrim.dark.left{background:rgba(12,21,48,.92)}
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    7. GENERIC SECTION
    ═══════════════════════════════════════════════════════════════════ */
 section{padding-block:clamp(4rem,8vw,7.5rem)}

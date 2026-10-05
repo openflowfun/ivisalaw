@@ -277,6 +277,122 @@ function wireTapPulse() {
   });
 }
 
+/*
+  Background video (BgVideo.astro). Three rules decide everything here:
+
+  1. Nothing loads unless it will be seen. Below 1000px the scrim is a flat
+     96% wash, so the video would be invisible — return before a byte moves.
+     The breakpoint is the scrim's, on purpose.
+  2. Nothing loads before the page has. Playback starts on `load`, so the
+     video never competes with fonts, CSS or the LCP for bandwidth.
+  3. The visitor's settings win. Reduced motion and Save-Data start paused,
+     with the controls still offered so they can opt in.
+*/
+function wireBgVideo() {
+  const host = document.querySelector<HTMLElement>('[data-bgv]');
+  const video = host?.querySelector('video');
+  const controls = document.querySelector<HTMLElement>('[data-bgv-controls]');
+  if (!video || !controls) return;
+  if (!window.matchMedia('(min-width: 1001px)').matches) return;
+
+  const playBtn = controls.querySelector<HTMLButtonElement>('[data-act="play"]');
+  const soundBtn = controls.querySelector<HTMLButtonElement>('[data-act="sound"]');
+  const soundLabel = soundBtn?.querySelector<HTMLElement>('.bgv-label');
+  if (!playBtn || !soundBtn || !soundLabel) return;
+
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  /*
+    Two separate facts, deliberately not one flag. `autoplay` is whether the
+    page may start the film by itself; `userPaused` is whether the visitor
+    stopped it. A browser refusing autoplay — as it does in a background tab —
+    is neither, and must not be recorded as the visitor's choice, or the film
+    stays paused forever once they switch to the tab.
+  */
+  let autoplay = !prefersReduced() && conn?.saveData !== true;
+  let userPaused = false;
+  let armed = false; // true once the page has finished loading
+  const shouldRun = () => autoplay && !userPaused;
+
+  const render = () => {
+    const playing = !video.paused;
+    playBtn.dataset.state = playing ? 'playing' : 'paused';
+    playBtn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
+    soundBtn.dataset.state = video.muted ? 'muted' : 'sound';
+    // The visible text is the accessible name, so it says what pressing does.
+    soundLabel.textContent = video.muted ? 'Play with sound' : 'Mute';
+  };
+
+  // A refusal changes nothing about intent; the next visibility or scroll
+  // event simply tries again.
+  const play = () => video.play().then(render, render);
+
+  controls.hidden = false;
+  render();
+  on(video, 'play', render);
+  on(video, 'pause', render);
+  on(video, 'volumechange', render);
+
+  on(playBtn, 'click', () => {
+    if (video.paused) {
+      // Pressing play is an opt-in, even for reduced-motion or Save-Data.
+      autoplay = true;
+      userPaused = false;
+      play();
+    } else {
+      userPaused = true;
+      video.pause();
+    }
+  });
+
+  on(soundBtn, 'click', () => {
+    if (video.muted) {
+      // Someone asking for sound wants the film, not to join a loop midway.
+      video.loop = false;
+      video.currentTime = 0;
+      video.muted = false;
+      autoplay = true;
+      userPaused = false;
+      play();
+    } else {
+      video.muted = true;
+      video.loop = true;
+      render();
+    }
+  });
+
+  // One full play-through with sound, then back to the silent ambient loop.
+  on(video, 'ended', () => {
+    video.muted = true;
+    video.loop = true;
+    play();
+  });
+
+  // Muted: stop decoding while the hero is off screen. With sound on, leave
+  // it alone — the visitor chose to listen and may be reading further down.
+  let onScreen = true;
+  const io = new IntersectionObserver(([entry]) => {
+    onScreen = entry.isIntersecting;
+    if (!armed || !video.muted) return;
+    if (onScreen) { if (shouldRun()) play(); }
+    else video.pause();
+  });
+  io.observe(video);
+  cleanups.push(() => io.disconnect());
+
+  // Opened in a background tab: the browser held playback back. Start it the
+  // moment the tab is actually looked at.
+  on(document, 'visibilitychange', () => {
+    if (document.visibilityState === 'visible' && armed && onScreen && video.paused && shouldRun()) play();
+  });
+
+  const start = () => {
+    armed = true;
+    if (shouldRun()) play();
+  };
+  if (document.readyState === 'complete') start();
+  else on(window, 'load', start, { once: true });
+}
+
 /* ─────────────────────────────────────────────────────────────
    Per-page wiring
    ───────────────────────────────────────────────────────────── */
@@ -397,6 +513,9 @@ function initPage() {
 
   /* edge-light on card grids */
   wireEdgeLight();
+
+  /* hero background video, where present */
+  wireBgVideo();
 
   /* guilloche: only animate while one is actually on screen */
   guilloEls = Array.from(document.querySelectorAll<HTMLElement>('.guillo'));

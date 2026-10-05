@@ -1,0 +1,97 @@
+---
+/*
+  A video used as a section background, with the visitor in control of it.
+
+  Ambient by default: muted, looping, behind the same AA-tuned scrim as the
+  photo backgrounds (global.css §6c), so the headline stays legible over
+  every frame. Browsers only autoplay muted video, so sound is always an
+  explicit choice — and "Play with sound" restarts the film from the top,
+  because someone asking for sound wants to watch it, not to join a loop at
+  second 41. When that one play-through ends it falls back to the silent loop.
+
+  Pause exists because WCAG 2.2.2 requires a way to stop any motion that runs
+  longer than five seconds, not as an optional extra.
+
+  The video file never loads until script decides it should: preload="none",
+  no autoplay attribute, and the controls start `hidden`. That keeps 3.7MB of
+  video away from phones (where the scrim is a flat 96% wash and the video
+  would be invisible), away from Save-Data and reduced-motion visitors unless
+  they opt in, and out of the critical path everywhere else. See
+  wireBgVideo() in scripts/site.ts.
+
+  Paths are root-relative; scripts/rebase-for-pages.mjs rewrites src and
+  poster for the GitHub Pages preview.
+*/
+interface Props {
+  /** Root-relative path to an MP4 in /public. */
+  src: string;
+  /** Root-relative path to the first frame, so nothing jumps on play. */
+  poster: string;
+  scrim?: 'light' | 'dark';
+  anchor?: 'left' | 'full';
+  /** Names the control group for screen readers. */
+  label: string;
+}
+const { src, poster, scrim = 'light', anchor = 'left', label } = Astro.props;
+---
+<div class="bgv" data-bgv aria-hidden="true">
+  <video
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster={poster}
+    tabindex="-1"
+    disablepictureinpicture
+  >
+    <source src={src} type="video/mp4" />
+  </video>
+  <span class:list={['bg-scrim', scrim, anchor]}></span>
+</div>
+
+<div class="wrap bgv-bar">
+  <div class="bgv-controls" data-bgv-controls role="group" aria-label={label} hidden>
+    <button type="button" class="bgv-btn bgv-play" data-act="play" aria-label="Play video" data-state="paused">
+      <svg class="i-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+      <svg class="i-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.2v11.6c0 .6.7 1 1.2.6l9-5.8a.7.7 0 0 0 0-1.2l-9-5.8C4.7 1.2 4 1.6 4 2.2z"/></svg>
+    </button>
+    <button type="button" class="bgv-btn bgv-sound" data-act="sound" data-state="muted">
+      <svg class="i-muted" viewBox="0 0 20 16" width="18" height="15" aria-hidden="true"><path d="M2 5.5h3L9.5 2v12L5 10.5H2z" fill="currentColor"/><path d="M13 5.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <svg class="i-sound" viewBox="0 0 20 16" width="18" height="15" aria-hidden="true"><path d="M2 5.5h3L9.5 2v12L5 10.5H2z" fill="currentColor"/><path d="M12.5 5.2a4 4 0 0 1 0 5.6M15 2.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <span class="bgv-label">Play with sound</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .bgv{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  .bgv video{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+
+  /* Aligned to the content edge rather than the viewport edge, and sitting in
+     the hero's bottom padding so it never overlaps the triage panel. */
+  .bgv-bar{position:absolute;left:0;right:0;bottom:clamp(1rem,2vw,1.6rem);z-index:2;display:flex;justify-content:flex-end;pointer-events:none}
+  .bgv-controls{display:flex;gap:.5rem;pointer-events:auto}
+  .bgv-controls[hidden]{display:none}
+
+  .bgv-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+    height:44px;min-width:44px;padding:0 .95rem;
+    border-radius:100px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(12,21,48,.84);color:#fff;
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    font:600 .82rem/1 var(--sans);letter-spacing:.01em;cursor:pointer;
+    transition:background .3s var(--ease),transform .3s var(--ease);
+  }
+  .bgv-btn:hover{background:var(--ink);transform:translateY(-1px)}
+  .bgv-btn svg{fill:currentColor;flex-shrink:0}
+  .bgv-play{padding:0}
+
+  .bgv-play[data-state="playing"] .i-play,
+  .bgv-play[data-state="paused"] .i-pause{display:none}
+  .bgv-sound[data-state="muted"] .i-sound,
+  .bgv-sound[data-state="sound"] .i-muted{display:none}
+
+  /* Matches the scrim's breakpoint: below it the background is a flat wash,
+     the video never loads, and controls for it would be controls for nothing. */
+  @media (max-width:1000px){ .bgv-bar{display:none} }
+</style>
