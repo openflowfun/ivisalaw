@@ -119,15 +119,28 @@ let panes: HTMLElement[] = [];
 let rails: HTMLElement[] = [];
 let cur = 0;
 
+/*
+  A pane that is not on screen should not be reachable or read out. The panes
+  cross-fade, so hidden ones stay in the layout instead of going display:none,
+  and both halves have to be withdrawn by hand: with aria-hidden alone they
+  stayed in the tab order, and Tab walked into stages nobody could see or hear.
+*/
+function setPaneShown(p: HTMLElement, shown: boolean) {
+  if (shown) {
+    p.tabIndex = 0;
+    p.removeAttribute('aria-hidden');
+  } else {
+    p.removeAttribute('tabindex');
+    p.setAttribute('aria-hidden', 'true');
+  }
+}
+
 function setStage(i: number) {
   if (i === cur) return;
   cur = i;
   panes.forEach((p, n) => {
     p.classList.toggle('on', n === i);
-    if (p.getAttribute('role') === 'tabpanel') {
-      if (n === i) p.removeAttribute('aria-hidden');
-      else p.setAttribute('aria-hidden', 'true');
-    }
+    if (p.getAttribute('role') === 'tabpanel') setPaneShown(p, n === i);
   });
   rails.forEach((r, n) => {
     r.classList.toggle('on', n === i);
@@ -162,10 +175,7 @@ function syncRailSemantics() {
     });
     panes.forEach((p, n) => {
       p.setAttribute('role', 'tabpanel');
-      p.tabIndex = 0;
-      // A pane that is not on screen should not be reachable or read out.
-      if (n === cur) p.removeAttribute('aria-hidden');
-      else p.setAttribute('aria-hidden', 'true');
+      setPaneShown(p, n === cur);
     });
   } else {
     rail.removeAttribute('role');

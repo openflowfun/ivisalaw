@@ -260,3 +260,16 @@ Found during the Astro 7 build (steps 1–3):
 - The guilloche SVG is ~32KB. Define it once as a `<symbol>` and reference it with `<use>`;
   inlining it per instance defeats gzip, whose 32KB window cannot dedupe the copies. Cut the
   homepage from 47.7KB to 18.1KB gzipped.
+
+Found during the client audit (Lighthouse, Oct 2026):
+
+- **Rebasing for a subpath has to cover CSS `url()`, not just HTML attributes.** The fonts'
+  `@font-face` sources stayed at `/fonts/` on the Pages preview and 404'd, so the preview
+  rendered in fallback system fonts while the preloads fetched the real files for nothing.
+  `rebase-for-pages.mjs` now rewrites `.css` and inline styles, and its leak guard checks them.
+- **Never mute text with `opacity`.** It composites every colour inside toward the background
+  and fails contrast in ways the token values hide (2.6–3.2:1 measured). Mute with a colour
+  that is itself measured, e.g. `--ink-3`.
+- **Cross-faded panels need taking out of the tab order as well as hiding.** `aria-hidden` on
+  an `opacity:0` pane hid it from screen readers but left `tabindex="0"`, so Tab walked into
+  stages nobody could see. `setPaneShown()` in `src/scripts/site.ts` does both together.

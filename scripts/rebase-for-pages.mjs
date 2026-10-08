@@ -27,8 +27,9 @@ const DIST = 'dist';
 /* Origin the preview is actually served from, for absolute social URLs. */
 const PREVIEW_ORIGIN = process.env.PREVIEW_ORIGIN || '';
 /* .webmanifest matters: its icon paths are root-absolute too, and a manifest
-   whose icons 404 is exactly the kind of thing nobody notices. */
-const REWRITABLE = new Set(['.html', '.xml', '.txt', '.webmanifest', '.json']);
+   whose icons 404 is exactly the kind of thing nobody notices. .css is here
+   for the @font-face sources — see cssUrlPattern below. */
+const REWRITABLE = new Set(['.html', '.css', '.xml', '.txt', '.webmanifest', '.json']);
 
 function walk(dir) {
   return readdirSync(dir).flatMap(name => {
@@ -60,6 +61,16 @@ const attrPattern = new RegExp(`(href|src|poster)="/(?!${slug}/)`, 'g');
 const srcsetPattern = /(srcset|imagesrcset)="([^"]*)"/g;
 const urlInSrcset = new RegExp(`(^|,\\s*)/(?!${slug}/)`, 'g');
 
+/*
+  CSS url() values are root-absolute too, and the self-hosted fonts live at
+  /fonts/. Missing them is silent in the same way srcset was: the preload
+  <link> is rebased and fetches the font, the @font-face rule asks for the
+  old path and 404s, and the whole site renders in fallback system fonts.
+  Found by Lighthouse on the preview, 5 Oct 2026. The quote is optional
+  because minifiers drop it.
+*/
+const cssUrlPattern = new RegExp(`url\\((['"]?)/(?!/)(?!${slug}/)`, 'g');
+
 let files = 0;
 let edits = 0;
 for (const file of walk(DIST)) {
@@ -78,6 +89,14 @@ for (const file of walk(DIST)) {
     });
     return `${attr}="${rewritten}"`;
   });
+
+  // Stylesheets, plus <style> blocks and style attributes Astro inlines.
+  if (extname(file) === '.css' || extname(file) === '.html') {
+    after = after.replace(cssUrlPattern, (_m, quote) => {
+      edits++;
+      return `url(${quote}${base}/`;
+    });
+  }
 
   /*
     og:image and twitter:image are absolute URLs to the production domain,
@@ -128,6 +147,10 @@ for (const file of walk(DIST)) {
      /fonts/ — so look at the attributes themselves. Protocol-relative URLs
      ("//") are external and fine. */
   for (const m of html.matchAll(new RegExp(`\\b(href|src|poster)="/(?!/)(?!${slug}/)[^"]*"`, 'g'))) {
+    leaks.push(`${file}: ${m[0]}`);
+  }
+  /* The attribute check cannot see CSS, which is how the fonts got through. */
+  for (const m of html.matchAll(new RegExp(`url\\((['"]?)/(?!/)(?!${slug}/)[^)]*\\)`, 'g'))) {
     leaks.push(`${file}: ${m[0]}`);
   }
 }
