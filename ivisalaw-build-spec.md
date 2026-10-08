@@ -273,3 +273,8 @@ Found during the client audit (Lighthouse, Oct 2026):
 - **Cross-faded panels need taking out of the tab order as well as hiding.** `aria-hidden` on
   an `opacity:0` pane hid it from screen readers but left `tabindex="0"`, so Tab walked into
   stages nobody could see. `setPaneShown()` in `src/scripts/site.ts` does both together.
+- **Government links move; check them before launch.** The IAA register left
+  `iaa.ewr.govt.nz` (no DNS at all by Oct 2026) for MBIE's registers platform, which left every
+  "Verify" link on a site whose whole argument is "verify us" pointing nowhere. `SITE.iaaRegister`
+  now uses the IAA homepage's own "Find an adviser" link. Re-check it, and every
+  immigration.govt.nz citation, as part of the launch pass.

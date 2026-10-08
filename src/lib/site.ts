@@ -13,7 +13,11 @@ export const SITE = {
     postcode: '1010',
     country: 'NZ',
   },
-  iaaRegister: 'https://iaa.ewr.govt.nz/PublicRegister/',
+  /* The IAA's own "Find an adviser" link. The register moved to MBIE's
+     registers platform; the old iaa.ewr.govt.nz host no longer resolves, so
+     every Verify link pointed nowhere until the Oct 2026 audit caught it.
+     If this breaks again, copy the link from the IAA homepage. */
+  iaaRegister: 'https://app.mbieregisters.govt.nz/iaa/ui/start/searchForAnOccupationalRegistration',
 } as const;
 
 export const NAV = [
