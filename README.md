@@ -7,21 +7,13 @@ Astro 7 · Tailwind 4 · Cloudflare Pages (target)
 
 ---
 
-## ⚠️ Pre-launch — not client-approved
+## Pre-launch
 
-This build is **not ready to be published as the live site**:
-
-- **IAA licence numbers are placeholders.** Five of six advisers show `IAA —`.
-- **No policy figure has been signed off.** Every threshold, fee and duration on
-  every visa page is marked `verified: false` and needs client confirmation
-  against live INZ policy before launch. See the figure register at the foot of
-  each visa page.
-- **Who is a licensed adviser vs. case manager is currently guessed.**
-- Consultation fee and office hours are unset — see `PENDING` in `src/lib/site.ts`.
-
-Any preview deploy **must** be built with `PUBLIC_PREVIEW=true`, which emits
-`noindex, nofollow` and a `Disallow: /` robots.txt. A pre-launch site carrying
-unverified immigration advice must not be indexed or mistaken for the real one.
+This build is **not the live site yet**. Every preview must be built with
+`PUBLIC_PREVIEW=true` (see below), which emits `noindex, nofollow` and a
+`Disallow: /` robots.txt. Client-supplied values (consultation fee, office hours)
+are tracked in `PENDING` in `src/lib/site.ts`, and every policy figure on the visa
+pages stays `verified: false` until it has been signed off.
 
 ## Running it
 
@@ -34,30 +26,33 @@ npm run preview  # serves dist/
 
 ## Giving the client a preview link
 
-Any preview **must** be built with `PUBLIC_PREVIEW=true` — `npm run build:preview` and
-`npm run deploy:preview` both set it. That emits `noindex, nofollow` on all 9 pages and a
-`Disallow: /` robots.txt, so a pre-launch site carrying unverified immigration figures and
-placeholder licence numbers cannot be indexed or mistaken for the live one.
+Any preview **must** be built with `PUBLIC_PREVIEW=true` — `npm run build:preview`,
+`npm run build:pages` and `npm run deploy:preview` all set it. That emits
+`noindex, nofollow` on every page and a `Disallow: /` robots.txt, so the pre-launch
+site cannot be indexed or mistaken for the live one.
 
-**Cloudflare Pages** (recommended — it is the spec's step 11 target, serves at the root of
-`*.pages.dev` so internal links work unchanged, and reads private repos):
+**GitHub Pages** (current preview): `.github/workflows/pages.yml` builds with
+`npm run build:pages` on every push to `main` and publishes to
+`https://openflowfun.github.io/ivisalaw/`. Pages serves the repo under `/ivisalaw/`, so
+`scripts/rebase-for-pages.mjs` rewrites internal links, assets and CSS `url()`s to that
+subpath after the build (the source and the production build are untouched), and writes
+`.nojekyll` so `/_astro/` is not stripped. Requires Pages enabled with source
+"GitHub Actions", and a public repo unless the account is on a paid plan.
+
+**Cloudflare Pages** (production target — serves at the root, so no rebasing):
 
 ```bash
 npm run deploy:preview
 ```
 
-First run opens a browser to sign in to Cloudflare. After that it is one command and you get
-a permanent `https://ivisalaw-preview.pages.dev`. To make it redeploy on every push instead,
-connect the repo in the Cloudflare dashboard with build command
-`npm run build:preview` and output directory `dist`.
+First run opens a browser to sign in to Cloudflare; after that you get a permanent
+`https://ivisalaw-preview.pages.dev`. To redeploy on every push instead, connect the repo
+in the Cloudflare dashboard with build command `npm run build:preview` and output
+directory `dist`.
 
 **Live walkthrough, no account:** `npm run preview` then
-`npx cloudflared tunnel --url http://localhost:4330` gives a temporary public URL for as long
-as your machine stays on. Fine for a screen-share, not for sending a link.
-
-**Do not use GitHub Pages** without extra work: on a free plan it needs a public repo, and it
-serves at `/ivisalaw/`, which breaks all 25 internal link destinations unless the built HTML
-is rewritten.
+`npx cloudflared tunnel --url http://localhost:4330` gives a temporary public URL for as
+long as your machine stays on.
 
 ## Layout
 
@@ -73,12 +68,13 @@ src/
   lib/         site.ts (firm details + PENDING) · routes.ts (build-time link checking)
 scripts/
   make-plates.mjs        generates the guilloche section artwork
+  rebase-for-pages.mjs   rewrites the built site for the GitHub Pages subpath
   check-frontmatter.sh   catches the YAML colon trap before the build does
 ```
 
 ## Things that will bite you
 
-Collected in full in §7 of the build spec. The short version:
+Collected in §7 of the build spec. The short version:
 
 - **Never hand-maintain internal link lists.** `lib/routes.ts` checks every
   destination against the content collections at build time; unbuilt pages
@@ -96,7 +92,5 @@ Collected in full in §7 of the build spec. The short version:
 
 ## Status
 
-Build order steps 1–4 complete: scaffold, homepage, content schema + AEWV
-template, navigation skeleton. Next is the remaining 14 visa and employer pages.
-
-Full spec, page inventory, design tokens and open client items: `ivisalaw-build-spec.md`.
+Scaffold, homepage, content schema and navigation are done; visa and employer pages are
+in progress. Build order, page inventory and design tokens: `ivisalaw-build-spec.md`.

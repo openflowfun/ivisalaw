@@ -296,7 +296,11 @@ function wireTapPulse() {
   2. Nothing loads before the page has. Playback starts on `load`, so the
      video never competes with fonts, CSS or the LCP for bandwidth.
   3. The visitor's settings win. Reduced motion and Save-Data start paused,
-     with the controls still offered so they can opt in.
+     with the control still offered so they can opt in.
+
+  The film is silent, always: there is no sound control, and the audio track
+  is stripped from the file. Play/pause stays because WCAG 2.2.2 requires a
+  way to stop motion that runs longer than five seconds.
 */
 function wireBgVideo() {
   const host = document.querySelector<HTMLElement>('[data-bgv]');
@@ -306,9 +310,7 @@ function wireBgVideo() {
   if (!window.matchMedia('(min-width: 1001px)').matches) return;
 
   const playBtn = controls.querySelector<HTMLButtonElement>('[data-act="play"]');
-  const soundBtn = controls.querySelector<HTMLButtonElement>('[data-act="sound"]');
-  const soundLabel = soundBtn?.querySelector<HTMLElement>('.bgv-label');
-  if (!playBtn || !soundBtn || !soundLabel) return;
+  if (!playBtn) return;
 
   const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   /*
@@ -327,9 +329,6 @@ function wireBgVideo() {
     const playing = !video.paused;
     playBtn.dataset.state = playing ? 'playing' : 'paused';
     playBtn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
-    soundBtn.dataset.state = video.muted ? 'muted' : 'sound';
-    // The visible text is the accessible name, so it says what pressing does.
-    soundLabel.textContent = video.muted ? 'Play with sound' : 'Mute';
   };
 
   // A refusal changes nothing about intent; the next visibility or scroll
@@ -340,7 +339,6 @@ function wireBgVideo() {
   render();
   on(video, 'play', render);
   on(video, 'pause', render);
-  on(video, 'volumechange', render);
 
   on(playBtn, 'click', () => {
     if (video.paused) {
@@ -354,35 +352,11 @@ function wireBgVideo() {
     }
   });
 
-  on(soundBtn, 'click', () => {
-    if (video.muted) {
-      // Someone asking for sound wants the film, not to join a loop midway.
-      video.loop = false;
-      video.currentTime = 0;
-      video.muted = false;
-      autoplay = true;
-      userPaused = false;
-      play();
-    } else {
-      video.muted = true;
-      video.loop = true;
-      render();
-    }
-  });
-
-  // One full play-through with sound, then back to the silent ambient loop.
-  on(video, 'ended', () => {
-    video.muted = true;
-    video.loop = true;
-    play();
-  });
-
-  // Muted: stop decoding while the hero is off screen. With sound on, leave
-  // it alone — the visitor chose to listen and may be reading further down.
+  // Stop decoding while the hero is off screen.
   let onScreen = true;
   const io = new IntersectionObserver(([entry]) => {
     onScreen = entry.isIntersecting;
-    if (!armed || !video.muted) return;
+    if (!armed) return;
     if (onScreen) { if (shouldRun()) play(); }
     else video.pause();
   });

@@ -5,3 +5,7 @@ node_modules/
 *.log
 .env
 .env.production
+.env.*
+.dev.vars
+.wrangler/
+*.pem

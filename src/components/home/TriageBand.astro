@@ -1,0 +1,19 @@
+---
+import TriagePanel from './TriagePanel.astro';
+
+/*
+  The triage sits straight after the film rather than on top of it: the hero
+  is now the headline and the footage, and "where are you starting from?" is
+  the first thing on the second screen. Same component, same accordion.
+*/
+---
+<section class="triage-band">
+  <div class="wrap">
+    <TriagePanel />
+  </div>
+</section>
+
+<style>
+  .triage-band{padding-block:clamp(2.5rem,5vw,4rem)}
+  .triage-band :global(.triage){max-width:46rem;margin-inline:auto}
+</style>
