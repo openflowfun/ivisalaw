@@ -1,6 +1,5 @@
 ---
 import BgVideo from '../BgVideo.astro';
-import TriagePanel from './TriagePanel.astro';
 
 /*
   The firm's own film sits behind the hero: real office, real team, real
@@ -31,13 +30,14 @@ import TriagePanel from './TriagePanel.astro';
         <span>Three licensed advisers</span>
       </div>
     </div>
-    <TriagePanel />
   </div>
 </section>
 
 <style>
-  .hero{position:relative;padding:clamp(3rem,6vw,5rem) 0 clamp(4rem,8vw,6.5rem);overflow:hidden;isolation:isolate}
-  .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.06fr .94fr;gap:clamp(2rem,5vw,5rem);align-items:start}
+  .hero{position:relative;padding:clamp(3rem,6vw,5rem) 0 clamp(4rem,8vw,6.5rem);overflow:hidden;isolation:isolate;display:flex;align-items:center}
+  .hero .wrap{position:relative;z-index:1;width:100%}
+  .hero .wrap>div{max-width:min(38rem,54%)}
+  @media (min-width:1001px){.hero{min-height:min(46rem,calc(100svh - 5rem))}}
   .kicker{display:inline-flex;align-items:center;gap:.6rem;font-size:.85rem;font-weight:600;color:var(--pounamu);background:var(--pounamu-bg);padding:.45rem .95rem;border-radius:100px;margin-bottom:2rem}
   .kicker i{width:7px;height:7px;border-radius:50%;background:var(--pounamu);flex-shrink:0;position:relative}
   .kicker i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--pounamu);opacity:.5;animation:pulse 2.8s var(--ease) infinite}
@@ -61,7 +61,7 @@ import TriagePanel from './TriagePanel.astro';
   .on-film .hero-meta{color:#CBD3EA;border-top-color:rgba(255,255,255,.22)}
 
   @media (max-width:1000px){
-    .hero .wrap{grid-template-columns:1fr}
+    .hero .wrap>div{max-width:none}
   }
   @media (prefers-reduced-motion:reduce){
     h1 .ln>span{transform:none!important}
