@@ -24,6 +24,10 @@ const url = new URL(Astro.url.pathname, SITE.url).href;
   single sign-off list (build spec §6) and the reader can see where each
   number came from. `verified` is false until the client confirms it.
 */
+// "CLIENT TO SUPPLY" notes are for the dev team; they never ship in a build.
+const publicNote = (note?: string) =>
+  note && !import.meta.env.DEV && note.startsWith('CLIENT TO SUPPLY') ? undefined : note;
+
 const register = [
   ...d.keyFigures.map(f => ({ ...f, where: 'Key figures' })),
   ...d.eligibility.flatMap(e => (e.figure ? [{ ...e.figure, where: e.title }] : [])),
@@ -31,7 +35,7 @@ const register = [
   // their own, so the register stays a policy-figure list and not a duplicate.
   ...d.cost.filter(c => c.source).map(c => ({
     value: c.amount, label: c.item, effective: undefined as string | undefined,
-    note: c.note, source: c.source, verified: c.verified, where: 'Cost',
+    note: publicNote(c.note), source: c.source, verified: c.verified, where: 'Cost',
   })),
 ];
 // Fees without their own source still need client sign-off.
@@ -275,7 +279,7 @@ const schema = [
                 <tr>
                   <th scope="row">{c.item}</th>
                   <td class="num">{c.amount}</td>
-                  <td class="note">{c.note}</td>
+                  <td class="note">{publicNote(c.note)}</td>
                 </tr>
               ))}
             </tbody>
