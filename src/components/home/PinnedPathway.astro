@@ -25,17 +25,20 @@ const stages = [
     dur: 'After 2 years as a resident' },
 ];
 ---
-<div class="pin-outer">
+<div class="pin-outer" data-stage="0">
   <Guilloche />
-  <div class="wrap intro">
-    <div class="sec-head">
-      <h2 class="wipe">Nobody arrives on a resident visa</h2>
-      <p class="rv" data-d="1">Residence is the end of a sequence, not the start of one. Knowing which stage you're at, and what the next one demands, is most of the work.</p>
-    </div>
-  </div>
   <div class="pin-track" id="pinTrack">
     <div class="pin-stage">
-      <div class="wrap">
+      <div class="aura" aria-hidden="true"><i></i><i></i></div>
+      <div class="bgword" aria-hidden="true">Residence</div>
+
+      <div class="wrap head">
+        <span class="eyebrow rv"><i></i>The residence pathway</span>
+        <h2 class="wipe">Nobody arrives on a resident visa</h2>
+        <p class="rv" data-d="1">Residence is the end of a sequence, not the start of one. Knowing which stage you're at, and what the next one demands, is most of the work.</p>
+      </div>
+
+      <div class="wrap body">
         <div class="rail" id="rail">
           {stages.map((s, i) => (
             <button
@@ -55,6 +58,13 @@ const stages = [
               <span class="dur">{s.dur}</span>
             </div>
           ))}
+          <div class="dial" id="dial" data-n="01" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+              <circle class="ring-bg" cx="100" cy="100" r="90" />
+              <circle class="ring-fg" cx="100" cy="100" r="90" pathLength="100" />
+            </svg>
+            <span class="dial-of">of 04</span>
+          </div>
         </div>
       </div>
     </div>
@@ -64,44 +74,82 @@ const stages = [
 <style>
   .pin-outer{background:var(--deep);color:#fff;position:relative}
   .pin-outer :global(.guillo){opacity:.055;left:-18%;right:auto;color:#fff;animation-duration:340s;animation-direction:reverse}
-  .intro{padding-top:clamp(4rem,8vw,7rem)}
-  .intro .sec-head{margin-bottom:0}
-  .intro .sec-head h2{color:#fff}
-  .intro .sec-head p{color:#AEB9D8}
 
+  /* The whole section pins from its first pixel: heading, rail and panes all
+     live inside the sticky stage, so there is never an empty screen before
+     the stages begin. --p (0 to 1) is written on the track by site.ts. */
   .pin-track{height:420vh;position:relative}
-  .pin-stage{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
-  .pin-stage .wrap{width:100%;display:grid;grid-template-columns:.34fr .66fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative}
+  .pin-stage{position:sticky;top:0;height:100vh;min-height:620px;display:flex;flex-direction:column;justify-content:center;gap:clamp(1.4rem,4vh,3rem);overflow:hidden;padding-block:5.5rem 2rem}
+
+  /* atmosphere */
+  .aura i{position:absolute;border-radius:50%;pointer-events:none;will-change:transform;transition:transform 1.6s var(--ease),opacity 1.6s var(--ease)}
+  .aura i:nth-child(1){width:60vmax;height:60vmax;left:-14vmax;top:-18vmax;background:radial-gradient(closest-side,rgba(76,110,235,.34),rgba(76,110,235,0))}
+  .aura i:nth-child(2){width:48vmax;height:48vmax;right:-12vmax;bottom:-20vmax;background:radial-gradient(closest-side,rgba(60,90,220,.3),rgba(60,90,220,0))}
+  .pin-outer[data-stage="1"] .aura i:nth-child(1){transform:translate(26vmax,6vmax) scale(.9)}
+  .pin-outer[data-stage="1"] .aura i:nth-child(2){transform:translate(-18vmax,-8vmax) scale(1.15)}
+  .pin-outer[data-stage="2"] .aura i:nth-child(1){transform:translate(48vmax,22vmax) scale(1.1)}
+  .pin-outer[data-stage="2"] .aura i:nth-child(2){transform:translate(-36vmax,-18vmax) scale(.95)}
+  .pin-outer[data-stage="3"] .aura i:nth-child(1){transform:translate(20vmax,34vmax) scale(1.25)}
+  .pin-outer[data-stage="3"] .aura i:nth-child(2){transform:translate(-10vmax,-4vmax) scale(1.3)}
+  .bgword{position:absolute;left:0;bottom:-.2em;font-family:var(--serif);font-weight:300;font-size:clamp(9rem,24vw,24rem);line-height:1;letter-spacing:-.04em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(147,168,244,.13);transform:translate3d(calc(var(--p,0) * -34%),0,0);pointer-events:none;user-select:none}
+
+  .pin-stage .wrap{width:100%}
+  .head{position:relative;z-index:1}
+  .eyebrow{display:inline-flex;align-items:center;gap:.6rem;font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-on-ink);margin-bottom:1rem}
+  .eyebrow i{width:26px;height:1px;background:var(--indigo-on-ink)}
+  .head h2{font-family:var(--serif);font-size:clamp(2rem,4.6vh + 1.2vw,3.4rem);font-weight:350;letter-spacing:-.03em;color:#fff;max-width:22ch}
+  .head p{margin-top:.9rem;color:#AEB9D8;font-size:1.02rem;max-width:58ch}
+
+  .body{width:100%;display:grid;grid-template-columns:.3fr .7fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative;z-index:1}
   .rail{display:flex;flex-direction:column;gap:0;border-left:1px solid rgba(255,255,255,.18);padding-left:1.9rem;position:relative}
-  .rail::before{content:"";position:absolute;left:-1px;top:0;width:2px;background:var(--indigo-lite);height:var(--fill,0%);transition:height .35s linear}
+  .rail::before{content:"";position:absolute;left:-1px;top:0;width:2px;background:linear-gradient(180deg,var(--indigo-lite),#fff);box-shadow:0 0 14px rgba(185,199,255,.7);height:var(--fill,0%);transition:height .35s linear}
   /* Inactive stages stay muted against the white active one, but readable:
      #68769E measured 4.0:1 on ink; #7584AC is 4.85:1, the same hue lifted. */
-  .rail-item{padding:.85rem 0;font-size:.92rem;color:#7584AC;position:relative;transition:color .5s var(--ease);cursor:pointer;background:none;border:0;font-family:var(--sans);text-align:left}
-  .rail-item::before{content:"";position:absolute;left:calc(-1.9rem - 4px);top:1.25rem;width:7px;height:7px;border-radius:50%;background:#2A3763;transition:background .5s var(--ease),transform .5s var(--ease)}
-  .rail-item.on{color:#fff;font-weight:600}
-  .rail-item.on::before{background:var(--indigo-lite);transform:scale(1.6)}
-  .stage-panes{position:relative;min-height:340px}
-  .pane{position:absolute;inset:0;opacity:0;transform:translateY(26px);transition:opacity .6s var(--ease),transform .75s var(--ease);pointer-events:none}
-  .pane.on{opacity:1;transform:none;pointer-events:auto}
-  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;color:rgba(255,255,255,.38);font-weight:300;letter-spacing:-.05em}
+  .rail-item{padding:.85rem 0;font-size:.95rem;color:#7584AC;position:relative;transition:color .5s var(--ease),transform .5s var(--ease);cursor:pointer;background:none;border:0;font-family:var(--sans);text-align:left}
+  .rail-item::before{content:"";position:absolute;left:calc(-1.9rem - 4px);top:1.25rem;width:7px;height:7px;border-radius:50%;background:#2A3763;transition:background .5s var(--ease),transform .5s var(--ease),box-shadow .5s var(--ease)}
+  .rail-item.on{color:#fff;font-weight:600;transform:translateX(6px)}
+  .rail-item.on::before{background:var(--indigo-lite);transform:scale(1.6);box-shadow:0 0 0 5px rgba(185,199,255,.18),0 0 16px rgba(185,199,255,.8)}
+
+  .stage-panes{position:relative;min-height:330px}
+  .pane{position:absolute;inset:0;right:clamp(0px,16vw,230px);pointer-events:none}
+  .pane.on{pointer-events:auto}
+  /* Each line of a pane arrives on its own beat. */
+  .pane > *{opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .8s var(--ease)}
+  .pane.on > *{opacity:1;transform:none}
+  .pane.on > :nth-child(2){transition-delay:.08s}
+  .pane.on > :nth-child(3){transition-delay:.16s}
+  .pane.on > :nth-child(4){transition-delay:.24s}
+  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;font-weight:300;letter-spacing:-.05em;background:linear-gradient(180deg,#fff 0%,rgba(147,168,244,.35) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
   .pane h3{font-family:var(--serif);font-size:clamp(2rem,4.2vw,3.1rem);margin-top:-.16em;font-weight:350;letter-spacing:-.03em;color:#fff}
   .pane p{margin-top:1.3rem;color:#AEB9D8;font-size:1.08rem;max-width:48ch}
-  .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px}
+  .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px;background:rgba(185,199,255,.08)}
+
+  /* Progress dial: the ring fills with scroll, the number is the live stage. */
+  .dial{position:absolute;right:0;top:50%;translate:0 -50%;width:clamp(130px,15vw,210px);aspect-ratio:1;display:grid;place-items:center;align-content:center}
+  .dial svg{position:absolute;inset:0;width:100%;height:100%;rotate:-90deg;overflow:visible}
+  .dial circle{fill:none;stroke-width:2.2}
+  .ring-bg{stroke:rgba(255,255,255,.14)}
+  .ring-fg{stroke:var(--indigo-lite);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0) * 100);filter:drop-shadow(0 0 6px rgba(185,199,255,.8))}
+  .dial::before{content:attr(data-n);font-family:var(--serif);font-size:clamp(2.6rem,5vw,4.2rem);font-weight:300;letter-spacing:-.04em;line-height:1;color:#fff}
+  .dial-of{margin-top:.35rem;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--indigo-on-ink)}
 
   /* Unpin: the pinned section must not survive below 1000px. */
   @media (max-width:1000px){
     .pin-track{height:auto}
-    .pin-stage{position:static;height:auto;padding-block:1rem}
-    .pin-stage .wrap{grid-template-columns:1fr}
-    .rail{display:none}
+    .pin-stage{position:static;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem;gap:2.5rem}
+    .body{grid-template-columns:1fr}
+    .rail,.dial,.bgword{display:none}
     .stage-panes{position:static;min-height:0;display:flex;flex-direction:column;gap:3rem}
-    .pane{position:static;opacity:1;transform:none;pointer-events:auto}
+    .pane{position:static;right:auto;pointer-events:auto}
+    .pane > *{opacity:1;transform:none}
   }
   @media (prefers-reduced-motion:reduce){
     .pin-track{height:auto}
-    .pin-stage{position:static;height:auto}
+    .pin-stage{position:static;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem}
+    .body{grid-template-columns:1fr}
     .stage-panes{position:static;display:flex;flex-direction:column;gap:3rem;min-height:0}
-    .pane{position:static;opacity:1;transform:none;pointer-events:auto}
-    .rail{display:none}
+    .pane{position:static;right:auto;pointer-events:auto}
+    .pane > *{opacity:1;transform:none}
+    .rail,.dial,.bgword{display:none}
   }
 </style>

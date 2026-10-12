@@ -139,6 +139,8 @@ function setPaneShown(p: HTMLElement, shown: boolean) {
 function setStage(i: number) {
   if (i === cur) return;
   cur = i;
+  track?.closest<HTMLElement>('.pin-outer')?.setAttribute('data-stage', String(i));
+  document.getElementById('dial')?.setAttribute('data-n', String(i + 1).padStart(2, '0'));
   panes.forEach((p, n) => {
     p.classList.toggle('on', n === i);
     if (p.getAttribute('role') === 'tabpanel') setPaneShown(p, n === i);
@@ -231,6 +233,7 @@ function onScroll() {
     if (span > 0) {
       const p = Math.min(Math.max(-r.top / span, 0), 1);
       rail.style.setProperty('--fill', `${12 + p * 88}%`);
+      track.style.setProperty('--p', p.toFixed(4));
       setStage(Math.min(3, Math.floor(p * 3.999)));
     }
   }
