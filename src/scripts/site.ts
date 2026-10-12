@@ -1,4 +1,5 @@
 import Lenis from 'lenis';
+import { autoReveal, wireScrollWords, wireParallax, wireMagnetic, wireSpotlight, tickMotion, teardownMotion } from './motion';
 
 /*
   All page behaviour lives here. Two lifecycles are in play:
@@ -220,6 +221,7 @@ function onScroll() {
     mast.classList.toggle('stuck', y > 24);
     updateMastVisibility(y);
   }
+  if (!prefersReduced()) tickMotion(y);
 
   // Pinned pathway unpins below 1000px; the CSS media query and this
   // guard have to agree or the panes desync from the layout.
@@ -410,6 +412,15 @@ function initPage() {
     el.appendChild(s);
   });
 
+  /* motion layer: scroll-lit text, parallax, magnetic buttons, cursor light */
+  if (!reduce) {
+    autoReveal();
+    wireScrollWords();
+    wireParallax();
+    wireMagnetic(on);
+    wireSpotlight(on);
+  }
+
   /* reveal on enter */
   io = new IntersectionObserver(
     entries => {
@@ -508,6 +519,7 @@ function initPage() {
 }
 
 function teardownPage() {
+  teardownMotion();
   if (glowFrame) { cancelAnimationFrame(glowFrame); glowFrame = 0; }
   io?.disconnect();
   io = null;

@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+
+/*
+  A slow ticker of every pathway the firm covers, built from the visa pages
+  that actually exist so it can never advertise a page that is not there.
+  Decorative: the same pathways are listed, with links, in the services grid
+  below, so the ticker is hidden from assistive tech rather than read out
+  twice.
+*/
+const visas = await getCollection('visas');
+const labels = visas.map(v => v.data.navLabel).sort((a, b) => a.localeCompare(b));
+---
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {[0, 1].map(g => (
+      <div class="marquee-group" aria-hidden={g === 1 ? 'true' : undefined}>
+        {labels.map(l => (
+          <>
+            <span class="marquee-item">{l}</span>
+            <span class="marquee-dot"></span>
+          </>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>

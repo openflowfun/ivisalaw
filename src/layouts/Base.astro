@@ -69,7 +69,7 @@ const ogImageUrl = new URL(ogImage, SITE.url).href;
   <link rel="icon" href="/icon-32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
-  <meta name="theme-color" content="#1E2D6B" />
+  <meta name="theme-color" content="#0B1540" />
 
   {/*
     Any build that is not the live ivisalaw.co.nz site must not be indexed.
@@ -97,6 +97,8 @@ const ogImageUrl = new URL(ogImage, SITE.url).href;
   <ClientRouter />
 </head>
 <body>
+  <div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div id="spot" class="spot" aria-hidden="true"></div>
   <div id="prog" aria-hidden="true"></div>
   <a class="skip" href="#main">Skip to content</a>
 
