@@ -58,14 +58,15 @@
      and failed AA even before any image was behind it. */
   --ink-3:#5C6682;
 
-  /* brand — sampled from the supplied logo, do not alter */
-  --indigo:#3852B3;
-  --indigo-lite:#5C77D6;  /* active states, rails */
-  --indigo-deep:#22347A;  /* hovers, deep fills */
+  /* brand — navy, from the logo's wordmark and signage. The token names still
+     say "indigo" from when the accent was a brighter blue; the values are navy. */
+  --indigo:#1E2D6B;
+  --indigo-lite:#5A6BA8;  /* active states, rails, focus rings — has to read on ink and paper */
+  --indigo-deep:#14204F;  /* hovers, deep fills */
   /* Not a spec token. --indigo-lite is defined for active states and rails,
-     and at 4.35:1 on --ink it is too dark for small text. This is the tint to
-     use when indigo has to carry type on the dark ground: 5.2:1, meets AA. */
-  --indigo-on-ink:#6B85E0;
+     and at 3.5:1 on --ink it is too dark for small text. This is the tint to use when the brand
+     colour has to carry type on the dark ground: 5.8:1, meets AA. */
+  --indigo-on-ink:#7F8FC8;
 
   /* paper */
   --paper:#F2F5FB;        /* cool document stock */
@@ -205,7 +206,7 @@ html.js-lenis,html.js-lenis body{height:auto}
 
 .btn{display:inline-block;background:var(--indigo);color:#fff;text-decoration:none;font-weight:600;font-size:.94rem;padding:.78rem 1.5rem;border-radius:3px;border:none;cursor:pointer;font-family:var(--sans);position:relative;overflow:hidden;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
 .btn::after{display:none}
-.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -12px rgba(56,82,179,.62)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -12px rgba(30,45,107,.62)}
 
 /* ═══════════════════════════════════════════════════════════════════
    6b. EDGE-LIGHT — pointer-tracked card borders

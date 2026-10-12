@@ -26,7 +26,7 @@ for (const size of [32, 180, 192, 512]) {
    1200x630. Links shared to WhatsApp, Facebook and LinkedIn currently
    render blank, and for this audience those are the channels that matter.
 
-   The wordmark is vector: an indigo panel, the same skewed "i" as the
+   The wordmark is vector: a navy panel, the same skewed "i" as the
    favicon, and VISALAW drawn as rectangles so it needs no font at all.  */
 const W = 1200, H = 630;
 
@@ -73,7 +73,7 @@ const overlay = Buffer.from(`
   <rect width="${W}" height="${H}" fill="url(#s)"/>
 
   <g transform="translate(84 96) scale(1.5)">
-    <g transform="skewX(-9)" fill="#5C77D6">
+    <g transform="skewX(-9)" fill="#7F8FC8">
       <circle cx="9" cy="6" r="5"/>
       <path d="M5 15h8v34H5z"/>
     </g>
@@ -87,7 +87,7 @@ const overlay = Buffer.from(`
     before you pay us to find out.
   </text>
 
-  <rect x="84" y="452" width="120" height="2" fill="#5C77D6"/>
+  <rect x="84" y="452" width="120" height="2" fill="#7F8FC8"/>
   <text x="84" y="510" font-family="Helvetica, Arial, sans-serif" font-size="27" fill="#AEB9D8">
     Licensed immigration advisers · Central Auckland
   </text>
