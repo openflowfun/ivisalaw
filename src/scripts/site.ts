@@ -194,11 +194,32 @@ function syncRailSemantics() {
   }
 }
 
+/*
+  The header fades away when the reader scrolls down and returns the moment
+  they scroll back up. Never hidden while it is in use: the mobile menu is
+  open, or keyboard focus is inside it. A few pixels of jitter (trackpad
+  momentum, Lenis easing) is ignored so it does not flicker.
+*/
+let lastY = 0;
+function updateMastVisibility(y: number) {
+  if (!mast) return;
+  const dy = y - lastY;
+  if (Math.abs(dy) < 6 && y > 120) return;
+  lastY = y;
+  const inUse = mast.contains(document.activeElement) && document.activeElement !== document.body
+    || mast.querySelector('#menuBtn[aria-expanded="true"]') !== null;
+  const hide = dy > 0 && y > 120 && !inUse;
+  mast.classList.toggle('hide', hide);
+}
+
 function onScroll() {
   const y = window.scrollY;
   const h = document.documentElement.scrollHeight - window.innerHeight;
   if (prog) prog.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
-  if (mast) mast.classList.toggle('stuck', y > 24);
+  if (mast) {
+    mast.classList.toggle('stuck', y > 24);
+    updateMastVisibility(y);
+  }
 
   // Pinned pathway unpins below 1000px; the CSS media query and this
   // guard have to agree or the panes desync from the layout.
@@ -295,62 +316,25 @@ function wireTapPulse() {
      The breakpoint is the scrim's, on purpose.
   2. Nothing loads before the page has. Playback starts on `load`, so the
      video never competes with fonts, CSS or the LCP for bandwidth.
-  3. The visitor's settings win. Reduced motion and Save-Data start paused,
-     with the control still offered so they can opt in.
+  3. The visitor's settings win. Reduced motion and Save-Data never start it;
+     they keep the still poster.
 
-  The film is silent, always: there is no sound control, and the audio track
-  is stripped from the file. Play/pause stays because WCAG 2.2.2 requires a
-  way to stop motion that runs longer than five seconds.
+  The film is silent and has no on-page controls: the audio track is stripped
+  from the file, and the play/pause button was removed at the client's request.
 */
 function wireBgVideo() {
   const host = document.querySelector<HTMLElement>('[data-bgv]');
   const video = host?.querySelector('video');
-  const controls = document.querySelector<HTMLElement>('[data-bgv-controls]');
-  if (!video || !controls) return;
+  if (!video) return;
   if (!window.matchMedia('(min-width: 1001px)').matches) return;
 
-  const playBtn = controls.querySelector<HTMLButtonElement>('[data-act="play"]');
-  if (!playBtn) return;
-
   const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-  /*
-    Two separate facts, deliberately not one flag. `autoplay` is whether the
-    page may start the film by itself; `userPaused` is whether the visitor
-    stopped it. A browser refusing autoplay — as it does in a background tab —
-    is neither, and must not be recorded as the visitor's choice, or the film
-    stays paused forever once they switch to the tab.
-  */
-  let autoplay = !prefersReduced() && conn?.saveData !== true;
-  let userPaused = false;
+  const shouldRun = () => !prefersReduced() && conn?.saveData !== true;
   let armed = false; // true once the page has finished loading
-  const shouldRun = () => autoplay && !userPaused;
-
-  const render = () => {
-    const playing = !video.paused;
-    playBtn.dataset.state = playing ? 'playing' : 'paused';
-    playBtn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
-  };
 
   // A refusal changes nothing about intent; the next visibility or scroll
   // event simply tries again.
-  const play = () => video.play().then(render, render);
-
-  controls.hidden = false;
-  render();
-  on(video, 'play', render);
-  on(video, 'pause', render);
-
-  on(playBtn, 'click', () => {
-    if (video.paused) {
-      // Pressing play is an opt-in, even for reduced-motion or Save-Data.
-      autoplay = true;
-      userPaused = false;
-      play();
-    } else {
-      userPaused = true;
-      video.pause();
-    }
-  });
+  const play = () => { video.play().catch(() => {}); };
 
   // Stop decoding while the hero is off screen.
   let onScreen = true;
@@ -445,6 +429,9 @@ function initPage() {
   /* scroll chrome */
   prog = document.getElementById('prog');
   mast = document.getElementById('mast');
+  lastY = window.scrollY;
+  // Keyboard users must never land on a header they cannot see.
+  if (mast) on(mast, 'focusin', () => mast?.classList.remove('hide'));
   track = document.getElementById('pinTrack');
   rail = document.getElementById('rail');
   panes = Array.from(document.querySelectorAll<HTMLElement>('.pane'));
