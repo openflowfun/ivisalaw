@@ -53,13 +53,22 @@ eligibility, process, timeline, cost, what goes wrong, FAQ, related pathways.
 ## 4. Design tokens
 
 ```
---ink          #0C1530   primary text and dark ground
---indigo       #1E2D6B   brand navy (token name predates the navy change)
---indigo-lite  #5A6BA8   active states, rails, focus rings
---indigo-deep  #14204F   hovers, deep fills
---paper        #F2F5FB   page ground
---pounamu      #1B6A57   status and eligibility signals only
---rule         #D2DAEA   hairlines
+Canvas (dark theme — token names kept from the light palette)
+--paper        #0B1540   page ground, deep navy
+--white        #101C4D   raised surface: alternating bands, cards, tables
+--deep         #050B26   darkest bands: triage, pinned pathway, plates
+--ink          #F3F6FF   primary TEXT
+--ink-2        #C5CEEB   secondary text
+--ink-3        #9BA9D2   meta text
+--rule         #26356D   hairlines
+
+Accents
+--indigo       #93A8F4   links, rules, accents on the navy ground
+--indigo-lite  #B9C7FF   focus rings, glows, active states
+--indigo-deep  #14204F   text on white buttons
+--btn          #F3F6FF   primary button fill
+--royal        #2A43A6   solid blue fill that carries white text
+--pounamu      #5FD6B3   status and eligibility signals only
 
 Display  Newsreader, weight 350, tracking -0.03em
 Body     Public Sans, 300–700
