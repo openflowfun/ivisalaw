@@ -180,7 +180,9 @@ html.js-lenis,html.js-lenis body{height:auto}
 /* ═══════════════════════════════════════════════════════════════════
    6. HEADER
    ═══════════════════════════════════════════════════════════════════ */
-.masthead{position:sticky;top:0;z-index:80;transition:background .4s var(--ease),box-shadow .4s var(--ease),backdrop-filter .4s}
+.masthead{position:sticky;top:0;z-index:80;transition:background .4s var(--ease),box-shadow .4s var(--ease),backdrop-filter .4s,opacity .35s var(--ease),transform .5s var(--ease)}
+/* Fades away on scroll down, returns on scroll up (updateMastVisibility in site.ts). */
+.masthead.hide{opacity:0;transform:translateY(-100%);pointer-events:none}
 .masthead .wrap{display:flex;align-items:center;gap:2rem;height:88px;transition:height .4s var(--ease)}
 .masthead.stuck{background:rgba(242,245,251,.82);backdrop-filter:blur(16px) saturate(160%);box-shadow:0 1px 0 var(--rule),0 12px 32px -22px rgba(12,21,48,.35)}
 .masthead.stuck .wrap{height:68px}
