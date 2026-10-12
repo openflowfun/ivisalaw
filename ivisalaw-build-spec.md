@@ -54,9 +54,9 @@ eligibility, process, timeline, cost, what goes wrong, FAQ, related pathways.
 
 ```
 --ink          #0C1530   primary text and dark ground
---indigo       #3852B3   sampled from the logo — do not alter
---indigo-lite  #5C77D6   active states, rails
---indigo-deep  #22347A   hovers, deep fills
+--indigo       #1E2D6B   brand navy (token name predates the navy change)
+--indigo-lite  #5A6BA8   active states, rails, focus rings
+--indigo-deep  #14204F   hovers, deep fills
 --paper        #F2F5FB   page ground
 --pounamu      #1B6A57   status and eligibility signals only
 --rule         #D2DAEA   hairlines
