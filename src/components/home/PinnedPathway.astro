@@ -30,7 +30,6 @@ const stages = [
   <div class="pin-track" id="pinTrack">
     <div class="pin-stage">
       <div class="aura" aria-hidden="true"><i></i><i></i></div>
-      <div class="bgword" aria-hidden="true">Residence</div>
 
       <div class="wrap head">
         <span class="eyebrow rv"><i></i>The residence pathway</span>
@@ -79,7 +78,7 @@ const stages = [
      live inside the sticky stage, so there is never an empty screen before
      the stages begin. --p (0 to 1) is written on the track by site.ts. */
   .pin-track{height:420vh;position:relative}
-  .pin-stage{position:sticky;top:0;height:100vh;min-height:620px;display:flex;flex-direction:column;justify-content:center;gap:clamp(1.4rem,4vh,3rem);overflow:hidden;padding-block:5.5rem 2rem}
+  .pin-stage{position:sticky;top:0;height:100vh;min-height:640px;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;padding-block:clamp(4.25rem,9vh,5.75rem) clamp(1.5rem,4vh,3rem)}
 
   /* atmosphere */
   .aura i{position:absolute;border-radius:50%;pointer-events:none;will-change:transform;transition:transform 1.6s var(--ease),opacity 1.6s var(--ease)}
@@ -91,16 +90,18 @@ const stages = [
   .pin-outer[data-stage="2"] .aura i:nth-child(2){transform:translate(-36vmax,-18vmax) scale(.95)}
   .pin-outer[data-stage="3"] .aura i:nth-child(1){transform:translate(20vmax,34vmax) scale(1.25)}
   .pin-outer[data-stage="3"] .aura i:nth-child(2){transform:translate(-10vmax,-4vmax) scale(1.3)}
-  .bgword{position:absolute;left:0;bottom:-.2em;font-family:var(--serif);font-weight:300;font-size:clamp(9rem,24vw,24rem);line-height:1;letter-spacing:-.04em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(147,168,244,.13);transform:translate3d(calc(var(--p,0) * -34%),0,0);pointer-events:none;user-select:none}
 
   .pin-stage .wrap{width:100%}
+  /* The heading sits at the top of the stage on its own band, ruled off from
+     the stages below so the two never read as one block. */
   .head{position:relative;z-index:1}
+  .head::after{content:"";display:block;height:1px;margin-top:clamp(1.25rem,3.2vh,2.25rem);background:linear-gradient(90deg,rgba(255,255,255,.16),rgba(255,255,255,.04))}
   .eyebrow{display:inline-flex;align-items:center;gap:.6rem;font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-on-ink);margin-bottom:1rem}
   .eyebrow i{width:26px;height:1px;background:var(--indigo-on-ink)}
-  .head h2{font-family:var(--serif);font-size:clamp(2rem,4.6vh + 1.2vw,3.4rem);font-weight:350;letter-spacing:-.03em;color:#fff;max-width:22ch}
+  .head h2{font-family:var(--serif);font-size:clamp(2rem,4.2vh + 1.2vw,3.2rem);font-weight:350;letter-spacing:-.03em;line-height:1.04;color:#fff;max-width:24ch}
   .head p{margin-top:.9rem;color:#AEB9D8;font-size:1.02rem;max-width:58ch}
 
-  .body{width:100%;display:grid;grid-template-columns:.3fr .7fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative;z-index:1}
+  .body{flex:1;width:100%;display:grid;grid-template-columns:.3fr .7fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative;z-index:1}
   .rail{display:flex;flex-direction:column;gap:0;border-left:1px solid rgba(255,255,255,.18);padding-left:1.9rem;position:relative}
   .rail::before{content:"";position:absolute;left:-1px;top:0;width:2px;background:linear-gradient(180deg,var(--indigo-lite),#fff);box-shadow:0 0 14px rgba(185,199,255,.7);height:var(--fill,0%);transition:height .35s linear}
   /* Inactive stages stay muted against the white active one, but readable:
@@ -119,8 +120,8 @@ const stages = [
   .pane.on > :nth-child(2){transition-delay:.08s}
   .pane.on > :nth-child(3){transition-delay:.16s}
   .pane.on > :nth-child(4){transition-delay:.24s}
-  .pane .num{font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;font-weight:300;letter-spacing:-.05em;background:linear-gradient(180deg,#fff 0%,rgba(147,168,244,.35) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .pane h3{font-family:var(--serif);font-size:clamp(2rem,4.2vw,3.1rem);margin-top:-.16em;font-weight:350;letter-spacing:-.03em;color:#fff}
+  .pane .num{display:none;font-family:var(--serif);font-size:clamp(3.4rem,7vw,5.6rem);line-height:.9;font-weight:300;letter-spacing:-.05em;background:linear-gradient(180deg,#fff 0%,rgba(147,168,244,.35) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pane h3{font-family:var(--serif);font-size:clamp(2rem,4.2vw,3.1rem);font-weight:350;letter-spacing:-.03em;color:#fff}
   .pane p{margin-top:1.3rem;color:#AEB9D8;font-size:1.08rem;max-width:48ch}
   .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px;background:rgba(185,199,255,.08)}
 
@@ -136,20 +137,24 @@ const stages = [
   /* Unpin: the pinned section must not survive below 1000px. */
   @media (max-width:1000px){
     .pin-track{height:auto}
-    .pin-stage{position:static;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem;gap:2.5rem}
+    .pin-stage{position:relative;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem;gap:2.5rem}
     .body{grid-template-columns:1fr}
-    .rail,.dial,.bgword{display:none}
+    .rail,.dial{display:none}
     .stage-panes{position:static;min-height:0;display:flex;flex-direction:column;gap:3rem}
     .pane{position:static;right:auto;pointer-events:auto}
     .pane > *{opacity:1;transform:none}
+    .pane .num{display:block}
+    .head::after{display:none}
   }
   @media (prefers-reduced-motion:reduce){
     .pin-track{height:auto}
-    .pin-stage{position:static;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem}
+    .pin-stage{position:relative;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem}
     .body{grid-template-columns:1fr}
     .stage-panes{position:static;display:flex;flex-direction:column;gap:3rem;min-height:0}
     .pane{position:static;right:auto;pointer-events:auto}
     .pane > *{opacity:1;transform:none}
-    .rail,.dial,.bgword{display:none}
+    .pane .num{display:block}
+    .head::after{display:none}
+    .rail,.dial{display:none}
   }
 </style>
