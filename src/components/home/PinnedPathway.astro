@@ -57,13 +57,13 @@ const stages = [
               <span class="dur">{s.dur}</span>
             </div>
           ))}
-          <div class="dial" id="dial" data-n="01" aria-hidden="true">
-            <svg viewBox="0 0 200 200">
-              <circle class="ring-bg" cx="100" cy="100" r="90" />
-              <circle class="ring-fg" cx="100" cy="100" r="90" pathLength="100" />
-            </svg>
-            <span class="dial-of">of 04</span>
-          </div>
+        </div>
+        <div class="dial" id="dial" data-n="01" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <circle class="ring-bg" cx="100" cy="100" r="90" />
+            <circle class="ring-fg" cx="100" cy="100" r="90" pathLength="100" />
+          </svg>
+          <span class="dial-of">of 04</span>
         </div>
       </div>
     </div>
@@ -101,7 +101,8 @@ const stages = [
   .head h2{font-family:var(--serif);font-size:clamp(2rem,4.2vh + 1.2vw,3.2rem);font-weight:350;letter-spacing:-.03em;line-height:1.04;color:#fff;max-width:24ch}
   .head p{margin-top:.9rem;color:#AEB9D8;font-size:1.02rem;max-width:58ch}
 
-  .body{flex:1;width:100%;display:grid;grid-template-columns:.3fr .7fr;gap:clamp(2rem,6vw,6rem);align-items:center;position:relative;z-index:1}
+  /* One row: rail, stage copy and dial share a single centre line. */
+  .body{flex:1;width:100%;display:grid;grid-template-columns:minmax(0,.27fr) minmax(0,.53fr) minmax(0,.2fr);gap:clamp(2rem,5vw,5rem);align-items:center;position:relative;z-index:1}
   .rail{display:flex;flex-direction:column;gap:0;border-left:1px solid rgba(255,255,255,.18);padding-left:1.9rem;position:relative}
   .rail::before{content:"";position:absolute;left:-1px;top:0;width:2px;background:linear-gradient(180deg,var(--indigo-lite),#fff);box-shadow:0 0 14px rgba(185,199,255,.7);height:var(--fill,0%);transition:height .35s linear}
   /* Inactive stages stay muted against the white active one, but readable:
@@ -111,8 +112,10 @@ const stages = [
   .rail-item.on{color:#fff;font-weight:600;transform:translateX(6px)}
   .rail-item.on::before{background:var(--indigo-lite);transform:scale(1.6);box-shadow:0 0 0 5px rgba(185,199,255,.18),0 0 16px rgba(185,199,255,.8)}
 
-  .stage-panes{position:relative;min-height:330px}
-  .pane{position:absolute;inset:0;right:clamp(0px,16vw,230px);pointer-events:none}
+  /* Panes overlap in one grid cell, so the cell is as tall as the tallest
+     pane and the copy sits on the same centre line as the rail and dial. */
+  .stage-panes{display:grid;align-items:center}
+  .pane{grid-area:1/1;pointer-events:none}
   .pane.on{pointer-events:auto}
   /* Each line of a pane arrives on its own beat. */
   .pane > *{opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .8s var(--ease)}
@@ -126,7 +129,7 @@ const stages = [
   .pane .dur{margin-top:1.7rem;display:inline-block;font-size:.85rem;color:#fff;border:1px solid rgba(255,255,255,.28);padding:.45rem .95rem;border-radius:100px;background:rgba(185,199,255,.08)}
 
   /* Progress dial: the ring fills with scroll, the number is the live stage. */
-  .dial{position:absolute;right:0;top:50%;translate:0 -50%;width:clamp(130px,15vw,210px);aspect-ratio:1;display:grid;place-items:center;align-content:center}
+  .dial{position:relative;justify-self:end;width:clamp(130px,14vw,200px);aspect-ratio:1;display:grid;place-items:center;align-content:center}
   .dial svg{position:absolute;inset:0;width:100%;height:100%;rotate:-90deg;overflow:visible}
   .dial circle{fill:none;stroke-width:2.2}
   .ring-bg{stroke:rgba(255,255,255,.14)}
@@ -141,7 +144,7 @@ const stages = [
     .body{grid-template-columns:1fr}
     .rail,.dial{display:none}
     .stage-panes{position:static;min-height:0;display:flex;flex-direction:column;gap:3rem}
-    .pane{position:static;right:auto;pointer-events:auto}
+    .pane{grid-area:auto;pointer-events:auto}
     .pane > *{opacity:1;transform:none}
     .pane .num{display:block}
     .head::after{display:none}
@@ -151,7 +154,7 @@ const stages = [
     .pin-stage{position:relative;height:auto;min-height:0;padding-block:clamp(4rem,8vw,6rem) 2rem}
     .body{grid-template-columns:1fr}
     .stage-panes{position:static;display:flex;flex-direction:column;gap:3rem;min-height:0}
-    .pane{position:static;right:auto;pointer-events:auto}
+    .pane{grid-area:auto;pointer-events:auto}
     .pane > *{opacity:1;transform:none}
     .pane .num{display:block}
     .head::after{display:none}
